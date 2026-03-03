@@ -1,6 +1,5 @@
 :root {
   --primary-color: #000000;
-  --background-color: #f3f4f6;
   --text-color: #1f2937;
   --high-priority: #ef4444;
   --low-priority: #10b981;
@@ -10,143 +9,132 @@
 
   --spacing: 16px;
   --border-radius: 8px;
-  --font-main: Arial, sans-serif;
+  --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   font-family: var(--font-main);
-  background-color: var(--bg);   /* antes --background-color */
+  background-color: var(--bg);
   color: var(--text-color);
 }
 
+/* Header negro + texto centrado y grande */
 header {
-  background-color: var(--primary-color); /* negro */
+  background-color: var(--primary-color);
   color: white;
   padding: var(--spacing);
+  text-align: center;
 }
 
+header h1 {
+  margin: 0;
+  font-size: 52px;
+  letter-spacing: 0.5px;
+}
+
+/* Layout general */
 main {
   display: flex;
   gap: var(--spacing);
   padding: var(--spacing);
 }
 
+/* Sidebar */
 aside {
-  width: 200px;
+  width: 220px;
   background: white;
   padding: var(--spacing);
   border-radius: var(--border-radius);
 }
 
+aside h2 {
+  margin-top: 0;
+}
+
+/* Interlineado y separación de la lista */
+aside ul {
+  line-height: 1.5;      /* interlineado */
+  padding-left: 20px;    /* sangría bonita */
+  margin: 0;
+}
+
+aside li {
+  margin: 8px 0;         /* separación extra */
+}
+
+/* Lista de tareas */
 .tasks {
   flex: 1;
 }
 
+/* Tarjeta de tarea */
 .task {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
   background: white;
   padding: var(--spacing);
   margin-bottom: var(--spacing);
   border-radius: var(--border-radius);
-  transition: all 0.3s ease;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .task:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
 }
 
-.meta {
-  display: flex;
-  flex-direction: column;   /* uno encima del otro */
-  gap: 6px;                 /* separación vertical */
-  align-items: center;      /* centrado horizontal */
-  justify-content: center;  /* centrado vertical */
-  min-width: 90px;          /* para que no se aplaste */
+/* Título de la tarea */
+.task h3 {
+  margin: 0;
 }
 
-.category,
-.priority {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  min-width: 70px;
-  text-align: center;
-}
-
-/* ✅ Colocar categoría + prioridad en columna y centrado */
-.task > .category,
-.task > .priority {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-width: 70px;
-}
-
-/* Contenedor “a la derecha” (si category y priority están como spans sueltos,
-   los agrupamos visualmente con esta técnica usando flex-column en un wrapper
-   si lo tienes; si NO tienes wrapper, usa la solución alternativa de abajo). */
-
-/* ✅ SOLUCIÓN PRINCIPAL (recomendada):
-   Si en tu HTML tienes algo como:
-   <div class="meta">
-     <span class="category">...</span>
-     <span class="priority high">...</span>
-   </div>
-   entonces esto lo deja perfecto.
-*/
+/* Bloque derecha: Estudio/Trabajo encima de Alta/Baja, centrado */
 .meta {
   display: flex;
   flex-direction: column;
   gap: 6px;
   align-items: center;
   justify-content: center;
-  min-width: 90px;
+  text-align: center;
+  min-width: 110px;
 }
 
-/* Badges de prioridad */
-.priority.high {
-  background: var(--high-priority);
-  color: white;
+/* Category centrado */
+.category {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+/* Prioridades (badges) */
+.priority {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 70px;
   padding: 4px 10px;
   border-radius: var(--border-radius);
+  color: white;
+  text-align: center;
+}
+
+.priority.high {
+  background: var(--high-priority);
 }
 
 .priority.low {
   background: var(--low-priority);
-  color: white;
-  padding: 4px 10px;
-  border-radius: var(--border-radius);
 }
 
-/* ✅ SOLUCIÓN ALTERNATIVA (si NO tienes <div class="meta"> en el HTML)
-   En ese caso, category y priority están sueltos dentro de .task.
-   Esto hace que se apilen en columna igualmente.
-*/
-.task {
-  position: relative;
-  padding-right: 130px; /* deja espacio para el bloque derecho */
-}
-
-.task .category,
-.task .priority {
-  position: absolute;
-  right: var(--spacing);
-}
-
-.task .category {
-  top: 50%;
-  transform: translateY(-120%); /* arriba */
-}
-
-.task .priority {
-  top: 50%;
-  transform: translateY(20%);   /* abajo */
-}
-
+/* Responsive */
 @media (max-width: 768px) {
   main {
     flex-direction: column;
@@ -156,19 +144,16 @@ aside {
     width: 100%;
   }
 
-  /* En móvil quitamos el posicionamiento absoluto para que no se rompa */
+  /* En móvil, que la tarjeta se adapte sin apretar */
   .task {
-    padding-right: var(--spacing);
+    gap: 12px;
   }
 
-  .task .category,
-  .task .priority {
-    position: static;
-    transform: none;
+  .meta {
+    min-width: 90px;
   }
 
-  /* En móvil los ponemos en columna al final */
-  .task {
-    gap: 10px;
+  header h1 {
+    font-size: 42px;
   }
 }
