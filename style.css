@@ -313,7 +313,7 @@ body{
 }
 
 tag.active {
-    background: white;
+    background: rgb(70, 70, 70);
     color: #000;
     font-weight: 600;
 }
