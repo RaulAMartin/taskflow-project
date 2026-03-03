@@ -314,7 +314,7 @@ body{
 
 tag.active {
     background: rgb(70, 70, 70);
-    color: #a50505;
+    color: #000000;
     font-weight: 600;
 }
 .tag-soft{ color: #4b5563; }
