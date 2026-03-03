@@ -47,7 +47,7 @@ main {
 /* Sidebar */
 aside {
   width: 220px;
-  background: white;
+  background: rgb(213, 248, 132);
   padding: var(--spacing);
   border-radius: var(--border-radius);
 }
@@ -96,15 +96,14 @@ aside li {
   margin: 0;
 }
 
-/* Bloque derecha: Estudio/Trabajo encima de Alta/Baja, centrado */
+/* Bloque derecha: Estudio/Trabajo centrado */
 .meta {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-width: 110px;
+  flex-direction: row;     /* ahora en fila */
+  align-items: center;     /* centrado vertical */
+  gap: 12px;               /* espacio entre categoría y prioridad */
+  min-width: 160px;
+  justify-content: center; /* centra el bloque dentro de la tarjeta */
 }
 
 /* Category centrado */
