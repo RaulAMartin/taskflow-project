@@ -1,0 +1,79 @@
+:root {
+  --primary-color: #4f46e5;
+  --background-color: #f3f4f6;
+  --text-color: #1f2937;
+  --high-priority: #ef4444;
+  --low-priority: #10b981;
+  --spacing: 16px;
+  --border-radius: 8px;
+  --font-main: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: var(--spacing);
+}
+
+main {
+  display: flex;
+  gap: var(--spacing);
+  padding: var(--spacing);
+}
+
+aside {
+  width: 200px;
+  background: white;
+  padding: var(--spacing);
+  border-radius: var(--border-radius);
+}
+
+.tasks {
+  flex: 1;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: var(--spacing);
+  margin-bottom: var(--spacing);
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.task:hover {
+  transform: scale(1.02);
+}
+
+.priority.high {
+  background: var(--high-priority);
+  color: white;
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+}
+
+.priority.low {
+  background: var(--low-priority);
+  color: white;
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+
+  aside {
+    width: 100%;
+  }
+}
