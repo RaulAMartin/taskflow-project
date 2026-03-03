@@ -307,8 +307,8 @@ body{
   padding: 5px 10px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.15);
-  background: rgb(54, 54, 54);
-  color: var(--muted);
+  background: #adadad;
+  color: #1f1e1e;
   transition: all 0.2s ease;
 }
 
