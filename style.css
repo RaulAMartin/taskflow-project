@@ -110,6 +110,7 @@ aside li {
 .category {
   display: block;
   width: 100%;
+  min-width: 80px;
   text-align: center;
 }
 
