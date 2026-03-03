@@ -78,7 +78,7 @@ aside li {
   align-items: center;
   justify-content: space-between;
 
-  background: white;
+  background: rgb(213, 248, 132);
   padding: var(--spacing);
   margin-bottom: var(--spacing);
   border-radius: var(--border-radius);
