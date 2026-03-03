@@ -1,9 +1,13 @@
 :root {
-  --primary-color: #4f46e5;
+  --primary-color: #000000;
   --background-color: #f3f4f6;
   --text-color: #1f2937;
   --high-priority: #ef4444;
   --low-priority: #10b981;
+
+  /* Fondo violeta claro */
+  --bg: #9580f3;
+
   --spacing: 16px;
   --border-radius: 8px;
   --font-main: Arial, sans-serif;
@@ -12,12 +16,12 @@
 body {
   margin: 0;
   font-family: var(--font-main);
-  background-color: var(--background-color);
+  background-color: var(--bg);   /* antes --background-color */
   color: var(--text-color);
 }
 
 header {
-  background-color: var(--primary-color);
+  background-color: var(--primary-color); /* negro */
   color: white;
   padding: var(--spacing);
 }
@@ -54,18 +58,93 @@ aside {
   transform: scale(1.02);
 }
 
+.meta {
+  display: flex;
+  flex-direction: column;   /* uno encima del otro */
+  gap: 6px;                 /* separación vertical */
+  align-items: center;      /* centrado horizontal */
+  justify-content: center;  /* centrado vertical */
+  min-width: 90px;          /* para que no se aplaste */
+}
+
+.category,
+.priority {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 70px;
+  text-align: center;
+}
+
+/* ✅ Colocar categoría + prioridad en columna y centrado */
+.task > .category,
+.task > .priority {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 70px;
+}
+
+/* Contenedor “a la derecha” (si category y priority están como spans sueltos,
+   los agrupamos visualmente con esta técnica usando flex-column en un wrapper
+   si lo tienes; si NO tienes wrapper, usa la solución alternativa de abajo). */
+
+/* ✅ SOLUCIÓN PRINCIPAL (recomendada):
+   Si en tu HTML tienes algo como:
+   <div class="meta">
+     <span class="category">...</span>
+     <span class="priority high">...</span>
+   </div>
+   entonces esto lo deja perfecto.
+*/
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+}
+
+/* Badges de prioridad */
 .priority.high {
   background: var(--high-priority);
   color: white;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: var(--border-radius);
 }
 
 .priority.low {
   background: var(--low-priority);
   color: white;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: var(--border-radius);
+}
+
+/* ✅ SOLUCIÓN ALTERNATIVA (si NO tienes <div class="meta"> en el HTML)
+   En ese caso, category y priority están sueltos dentro de .task.
+   Esto hace que se apilen en columna igualmente.
+*/
+.task {
+  position: relative;
+  padding-right: 130px; /* deja espacio para el bloque derecho */
+}
+
+.task .category,
+.task .priority {
+  position: absolute;
+  right: var(--spacing);
+}
+
+.task .category {
+  top: 50%;
+  transform: translateY(-120%); /* arriba */
+}
+
+.task .priority {
+  top: 50%;
+  transform: translateY(20%);   /* abajo */
 }
 
 @media (max-width: 768px) {
@@ -75,5 +154,21 @@ aside {
 
   aside {
     width: 100%;
+  }
+
+  /* En móvil quitamos el posicionamiento absoluto para que no se rompa */
+  .task {
+    padding-right: var(--spacing);
+  }
+
+  .task .category,
+  .task .priority {
+    position: static;
+    transform: none;
+  }
+
+  /* En móvil los ponemos en columna al final */
+  .task {
+    gap: 10px;
   }
 }
