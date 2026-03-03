@@ -1,159 +1,166 @@
-:root {
-  --primary-color: #000000;
-  --text-color: #1f2937;
-  --high-priority: #ef4444;
-  --low-priority: #10b981;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taskflow Project</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-  /* Fondo violeta claro */
-  --bg: #9580f3;
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="brand-text">
+        <h1>Taskflow</h1>
+        <p>Organiza tu día con claridad</p>
+      </div>
+    </div>
 
-  --spacing: 16px;
-  --border-radius: 8px;
-  --font-main: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-}
+    <div class="actions">
+      <div class="search">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input type="text" placeholder="Buscar tareas..." />
+      </div>
+      <button class="btn-primary">+ Nueva tarea</button>
+    </div>
+  </header>
 
-* {
-  box-sizing: border-box;
-}
+  <main class="layout">
 
-body {
-  margin: 0;
-  font-family: var(--font-main);
-  background-color: var(--bg);
-  color: var(--text-color);
-}
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>Resumen</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value">8</div>
+            <div class="stat-label">Totales</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Hoy</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Urgentes</div>
+          </div>
+        </div>
+      </section>
 
-/* Header negro + texto centrado y grande */
-header {
-  background-color: var(--primary-color);
-  color: white;
-  padding: var(--spacing);
-  text-align: center;
-}
+      <section class="panel">
+        <h2>Categorías</h2>
+        <ul class="cat-list">
+          <li class="cat-item active"><span class="dot dot-study"></span> Estudio <span class="pill">3</span></li>
+          <li class="cat-item"><span class="dot dot-work"></span> Trabajo <span class="pill">3</span></li>
+          <li class="cat-item"><span class="dot dot-personal"></span> Personal <span class="pill">2</span></li>
+        </ul>
+      </section>
 
-header h1 {
-  margin: 0;
-  font-size: 52px;
-  letter-spacing: 0.5px;
-}
+      <section class="panel">
+        <h2>Filtros</h2>
+        <div class="filters">
+          <label class="check">
+            <input type="checkbox" checked />
+            <span>Mostrar alta prioridad</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" checked />
+            <span>Mostrar media prioridad</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" checked />
+            <span>Mostrar baja prioridad</span>
+          </label>
+        </div>
+      </section>
+    </aside>
 
-/* Layout general */
-main {
-  display: flex;
-  gap: var(--spacing);
-  padding: var(--spacing);
-}
+    <section class="content">
+      <header class="content-head">
+        <div>
+          <h2>Mis tareas</h2>
+          <p class="muted">Maqueta responsive con HTML + CSS</p>
+        </div>
+        <div class="segmented">
+          <button class="seg active">Todas</button>
+          <button class="seg">Hoy</button>
+          <button class="seg">Semana</button>
+        </div>
+      </header>
 
-/* Sidebar */
-aside {
-  width: 220px;
-  background: rgb(213, 248, 132);
-  padding: var(--spacing);
-  border-radius: var(--border-radius);
-}
+      <section class="grid">
 
-aside h2 {
-  margin-top: 0;
-}
+        <article class="task-card">
+          <div class="task-main">
+            <div class="task-title">Terminar práctica DAM</div>
+            <div class="task-desc muted">Estructura HTML + CSS, responsive y deploy en Vercel.</div>
+            <div class="task-tags">
+              <span class="tag tag-study">Estudio</span>
+              <span class="tag tag-soft">Frontend</span>
+              <span class="tag tag-soft">Responsive</span>
+            </div>
+          </div>
 
-/* Interlineado y separación de la lista */
-aside ul {
-  line-height: 1.5;      /* interlineado */
-  padding-left: 20px;    /* sangría bonita */
-  margin: 0;
-}
+          <div class="task-side">
+            <div class="meta-col">
+              <div class="meta-label muted">Prioridad</div>
+              <span class="badge high">Alta</span>
+            </div>
+            <div class="meta-col">
+              <div class="meta-label muted">Vence</div>
+              <span class="badge neutral">Hoy</span>
+            </div>
+          </div>
+        </article>
 
-aside li {
-  margin: 8px 0;         /* separación extra */
-}
+        <article class="task-card">
+          <div class="task-main">
+            <div class="task-title">Revisar correos</div>
+            <div class="task-desc muted">Responder mensajes y dejar bandeja a cero.</div>
+            <div class="task-tags">
+              <span class="tag tag-work">Trabajo</span>
+              <span class="tag tag-soft">Comunicación</span>
+            </div>
+          </div>
 
-/* Lista de tareas */
-.tasks {
-  flex: 1;
-}
+          <div class="task-side">
+            <div class="meta-col">
+              <div class="meta-label muted">Prioridad</div>
+              <span class="badge low">Baja</span>
+            </div>
+            <div class="meta-col">
+              <div class="meta-label muted">Vence</div>
+              <span class="badge neutral">Mañana</span>
+            </div>
+          </div>
+        </article>
 
-/* Tarjeta de tarea */
-.task {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+        <article class="task-card">
+          <div class="task-main">
+            <div class="task-title">Preparar presentación</div>
+            <div class="task-desc muted">Dejar capturas y explicación en el README.</div>
+            <div class="task-tags">
+              <span class="tag tag-personal">Personal</span>
+              <span class="tag tag-soft">Documentación</span>
+            </div>
+          </div>
 
-  background: rgb(213, 248, 132);
-  padding: var(--spacing);
-  margin-bottom: var(--spacing);
-  border-radius: var(--border-radius);
+          <div class="task-side">
+            <div class="meta-col">
+              <div class="meta-label muted">Prioridad</div>
+              <span class="badge mid">Media</span>
+            </div>
+            <div class="meta-col">
+              <div class="meta-label muted">Vence</div>
+              <span class="badge neutral">Viernes</span>
+            </div>
+          </div>
+        </article>
 
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+      </section>
+    </section>
 
-.task:hover {
-  transform: scale(1.01);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
-}
+  </main>
 
-/* Título de la tarea */
-.task h3 {
-  margin: 0;
-}
-
-/* Bloque derecha: Estudio/Trabajo centrado */
-.meta {
-  display: flex;
-  flex-direction: row;     /* ahora en fila */
-  align-items: center;     /* centrado vertical */
-  gap: 12px;               /* espacio entre categoría y prioridad */
-  min-width: 160px;
-  justify-content: center; /* centra el bloque dentro de la tarjeta */
-}
-
-/* Category centrado */
-.category {
-  display: block;
-  width: 100%;
-  min-width: 80px;
-  text-align: center;
-}
-
-/* Prioridades (badges) */
-.priority {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  min-width: 70px;
-  padding: 4px 10px;
-  border-radius: var(--border-radius);
-  color: white;
-  text-align: center;
-}
-
-.priority.high {
-  background: var(--high-priority);
-}
-
-.priority.low {
-  background: var(--low-priority);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  main {
-    flex-direction: column;
-  }
-
-  aside {
-    width: 100%;
-  }
-
-  /* En móvil, que la tarjeta se adapte sin apretar */
-  .task {
-    gap: 12px;
-  }
-
-  .meta {
-    min-width: 90px;
-  }
-
-  header h1 {
-    font-size: 42px;
-  }
-}
+</body>
+</html>

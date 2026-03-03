@@ -1,46 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Taskflow Project</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <header>
-    <h1>Taskflow</h1>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="brand-text">
+        <h1>Taskflow</h1>
+        <p>Organiza tu día con claridad</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="search">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input type="text" placeholder="Buscar tareas..." />
+      </div>
+      <button class="btn-primary">+ Nueva tarea</button>
+    </div>
   </header>
 
-  <main>
+  <main class="layout">
 
-    <aside>
-      <h2>Categorías</h2>
-      <ul>
-        <li>Trabajo</li>
-        <li>Personal</li>
-        <li>Urgente</li>
-      </ul>
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>Resumen</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value">8</div>
+            <div class="stat-label">Totales</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Hoy</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Urgentes</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Categorías</h2>
+        <ul class="cat-list">
+          <li class="cat-item active"><span class="dot dot-study"></span> Estudio <span class="pill">3</span></li>
+          <li class="cat-item"><span class="dot dot-work"></span> Trabajo <span class="pill">3</span></li>
+          <li class="cat-item"><span class="dot dot-personal"></span> Personal <span class="pill">2</span></li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Filtros</h2>
+        <div class="filters">
+          <label class="check">
+            <input type="checkbox" checked />
+            <span>Mostrar alta prioridad</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" checked />
+            <span>Mostrar media prioridad</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" checked />
+            <span>Mostrar baja prioridad</span>
+          </label>
+        </div>
+      </section>
     </aside>
 
-    <section class="tasks">
-  <div class="task">
-    <h3>Terminar práctica DAM</h3>
+    <section class="content">
+      <header class="content-head">
+        <div>
+          <h2>Mis tareas</h2>
+          <p class="muted">Maqueta responsive con HTML + CSS</p>
+        </div>
+        <div class="segmented">
+          <button class="seg active">Todas</button>
+          <button class="seg">Hoy</button>
+          <button class="seg">Semana</button>
+        </div>
+      </header>
 
-    <div class="meta">
-      <span class="category">Estudio</span>
-      <span class="priority high">Alta</span>
-    </div>
-  </div>
+      <section class="grid">
 
-  <div class="task">
-    <h3>Revisar correos</h3>
+        <article class="task-card">
+          <div class="task-main">
+            <div class="task-title">Terminar práctica DAM</div>
+            <div class="task-desc muted">Estructura HTML + CSS, responsive y deploy en Vercel.</div>
+            <div class="task-tags">
+              <span class="tag tag-study">Estudio</span>
+              <span class="tag tag-soft">Frontend</span>
+              <span class="tag tag-soft">Responsive</span>
+            </div>
+          </div>
 
-    <div class="meta">
-      <span class="category">Trabajo</span>
-      <span class="priority low">Baja</span>
-    </div>
-  </div>
-</section>
+          <div class="task-side">
+            <div class="meta-col">
+              <div class="meta-label muted">Prioridad</div>
+              <span class="badge high">Alta</span>
+            </div>
+            <div class="meta-col">
+              <div class="meta-label muted">Vence</div>
+              <span class="badge neutral">Hoy</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="task-card">
+          <div class="task-main">
+            <div class="task-title">Revisar correos</div>
+            <div class="task-desc muted">Responder mensajes y dejar bandeja a cero.</div>
+            <div class="task-tags">
+              <span class="tag tag-work">Trabajo</span>
+              <span class="tag tag-soft">Comunicación</span>
+            </div>
+          </div>
+
+          <div class="task-side">
+            <div class="meta-col">
+              <div class="meta-label muted">Prioridad</div>
+              <span class="badge low">Baja</span>
+            </div>
+            <div class="meta-col">
+              <div class="meta-label muted">Vence</div>
+              <span class="badge neutral">Mañana</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="task-card">
+          <div class="task-main">
+            <div class="task-title">Preparar presentación</div>
+            <div class="task-desc muted">Dejar capturas y explicación en el README.</div>
+            <div class="task-tags">
+              <span class="tag tag-personal">Personal</span>
+              <span class="tag tag-soft">Documentación</span>
+            </div>
+          </div>
+
+          <div class="task-side">
+            <div class="meta-col">
+              <div class="meta-label muted">Prioridad</div>
+              <span class="badge mid">Media</span>
+            </div>
+            <div class="meta-col">
+              <div class="meta-label muted">Vence</div>
+              <span class="badge neutral">Viernes</span>
+            </div>
+          </div>
+        </article>
+
+      </section>
+    </section>
 
   </main>
 
