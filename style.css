@@ -492,7 +492,7 @@ body{
 }
 
 /* Responsive */
-@media (max-width: 900px){
+@media (max-width: 760px){
   .layout{ flex-direction:column; }
   .sidebar{ width: 100%; }
   .search input{ width: 140px; }
