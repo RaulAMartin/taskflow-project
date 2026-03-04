@@ -112,19 +112,27 @@ body{
   filter: brightness(1.05);
 }
 
-/* Layout */
+/* Layout (SIEMPRE lateral) */
 .layout{
   display:flex;
   gap: var(--space);
   padding: 22px;
-   align-items: flex-start; /* ✅ evita rarezas verticales */
-  flex-wrap: nowrap;       /* ✅ evita que baje a otra línea */
+  align-items:flex-start;
 }
 
-
-/* Sidebar */
+/* Sidebar (izquierda fija) */
 .sidebar{
+  flex: 0 0 280px;  /* ✅ fijo a la izquierda */
   width: 280px;
+  display:flex;
+  flex-direction:column;
+  gap: var(--space);
+}
+
+/* Content (derecha flexible) */
+.content{
+  flex: 1;
+  min-width: 0;     /* ✅ MUY IMPORTANTE para que no “salte” el layout */
   display:flex;
   flex-direction:column;
   gap: var(--space);
@@ -231,14 +239,7 @@ body{
   font-size: 14px;
 }
 
-/* Content */
-.content{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap: var(--space);
-}
-
+/* Cabecera contenido */
 .content-head{
   display:flex;
   align-items:flex-end;
@@ -269,7 +270,7 @@ body{
   padding: 8px 12px;
   border-radius: 999px;
   cursor:pointer;
-  color: #000;         /* legible */
+  color: #000;
   font-weight: 800;
 }
 
@@ -309,7 +310,7 @@ body{
   cursor: pointer;
 }
 
-/* Select: desplegable (fondo blanco del SO) */
+/* Select: desplegable */
 .task-form select option {
   color: black;
 }
@@ -408,14 +409,12 @@ body{
   background: rgba(255,255,255,0.10);
 }
 
-/* ✅ CORRECTO: .tag.active (con punto) */
 .tag.active{
   background: rgba(255,255,255,0.90);
   color: #000;
   font-weight: 900;
 }
 
-/* Tags secundarias gris oscuro */
 .tag-soft{ color: #4b5563; }
 
 .tag-study{ border-color: rgba(124,58,237,0.25); }
@@ -427,6 +426,8 @@ body{
   display:flex;
   gap: 12px;
   align-items:center;
+  flex-wrap: wrap; /* ✅ si falta espacio, no rompe */
+  justify-content: flex-end;
 }
 
 .meta-col{
@@ -477,7 +478,6 @@ body{
   filter: brightness(1.12);
 }
 
-/* Botón completar */
 .btn-ghost{
   border: 1px solid rgba(255,255,255,0.16);
   border-radius: 999px;
@@ -494,13 +494,7 @@ body{
   background: rgba(255,255,255,0.10);
 }
 
-/* Responsive */
-@media (max-width: 900px){
-  .layout{ flex-direction:column; }
-  .sidebar{ width: 100%; }
-  .search input{ width: 140px; }
-}
-
+/* Responsive SOLO para topbar y tarjetas (NO tocamos el layout lateral) */
 @media (max-width: 600px){
   .topbar{
     flex-direction:column;
@@ -509,6 +503,10 @@ body{
 
   .actions{
     justify-content:space-between;
+  }
+
+  .search input{
+    width: 140px;
   }
 
   .task-form{
@@ -534,5 +532,13 @@ body{
   .meta-col{
     width:auto;
     flex:1;
+  }
+}
+
+/* Si la pantalla es tan pequeña que no cabe el layout lateral,
+   permitimos scroll horizontal en vez de romperlo a columna */
+@media (max-width: 520px){
+  .layout{
+    overflow-x: auto;
   }
 }
