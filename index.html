@@ -52,30 +52,31 @@
       <section class="panel">
         <h2>Categorías</h2>
         <ul class="cat-list">
-          <li class="cat-item active"><span class="dot dot-study"></span> Estudio <span class="pill">3</span></li>
-          <li class="cat-item"><span class="dot dot-work"></span> Trabajo <span class="pill">3</span></li>
-          <li class="cat-item"><span class="dot dot-personal"></span> Personal <span class="pill">2</span></li>
+          <li class="cat-item active"><span class="dot dot-study"></span> Estudio <span class="pill" id="pillStudy">0</span></li>
+          <li class="cat-item"><span class="dot dot-work"></span> Trabajo <span class="pill" id="pillWork">0</span></li>
+          <li class="cat-item"><span class="dot dot-personal"></span> Personal <span class="pill" id="pillPersonal">0</span></li>
         </ul>
       </section>
 
       <section class="panel">
-        <h2>Filtros</h2>
-        <div class="filters">
-          <label class="check">
-            <input type="checkbox" checked />
-            <span>Mostrar alta prioridad</span>
-          </label>
-          <label class="check">
-            <input type="checkbox" checked />
-            <span>Mostrar media prioridad</span>
-          </label>
-          <label class="check">
-            <input type="checkbox" checked />
-            <span>Mostrar baja prioridad</span>
-          </label>
-        </div>
-      </section>
-    </aside>
+  <h2>Filtros</h2>
+  <div class="filters">
+    <label class="check">
+      <input id="filterHigh" type="checkbox" checked />
+      <span>Mostrar alta prioridad</span>
+    </label>
+
+    <label class="check">
+      <input id="filterMid" type="checkbox" checked />
+      <span>Mostrar media prioridad</span>
+    </label>
+
+    <label class="check">
+      <input id="filterLow" type="checkbox" checked />
+      <span>Mostrar baja prioridad</span>
+    </label>
+  </div>
+</section>
 
     <section class="content">
       <header class="content-head">

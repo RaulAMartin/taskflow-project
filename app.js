@@ -18,6 +18,10 @@ const statTotal = document.getElementById("statTotal");
 const statPending = document.getElementById("statPending");
 const statHigh = document.getElementById("statHigh");
 
+const pillStudy = document.getElementById("pillStudy");
+const pillWork = document.getElementById("pillWork");
+const pillPersonal = document.getElementById("pillPersonal");
+
 // --------- LocalStorage ---------
 const STORAGE_KEY = "taskflow_tasks_v3";
 
@@ -111,6 +115,15 @@ function updateStats() {
   if (statTotal) statTotal.textContent = String(total);
   if (statPending) statPending.textContent = String(pending);
   if (statHigh) statHigh.textContent = String(high);
+
+  // ---- contadores por categoría (TOTAL por categoría) ----
+  const studyCount = tasks.filter(t => t.category === "Estudio").length;
+  const workCount = tasks.filter(t => t.category === "Trabajo").length;
+  const personalCount = tasks.filter(t => t.category === "Personal").length;
+
+  if (pillStudy) pillStudy.textContent = String(studyCount);
+  if (pillWork) pillWork.textContent = String(workCount);
+  if (pillPersonal) pillPersonal.textContent = String(personalCount);
 }
 
 // --------- Crear tarjeta DOM ---------
@@ -158,10 +171,16 @@ function createTaskElement(task) {
 
 // --------- Filtros ---------
 function getAllowedPriorities() {
+  if (!filterHigh && !filterMid && !filterLow) {
+    return new Set(["Alta", "Media", "Baja"]);
+  }
+
   const set = new Set();
   if (filterHigh?.checked) set.add("Alta");
   if (filterMid?.checked) set.add("Media");
   if (filterLow?.checked) set.add("Baja");
+
+  // Si el usuario desmarca los 3, entonces NO se muestra nada (como filtro real)
   return set;
 }
 
