@@ -87,6 +87,29 @@
           <button class="seg">Semana</button>
         </div>
       </header>
+      
+      <section class="composer">
+  <form id="taskForm" class="task-form">
+    <input id="taskInput" type="text" placeholder="Escribe una tarea y pulsa Enter..." required />
+    <select id="taskCategory">
+      <option value="Estudio">Estudio</option>
+      <option value="Trabajo">Trabajo</option>
+      <option value="Personal">Personal</option>
+    </select>
+    <select id="taskPriority">
+      <option value="Alta">Alta</option>
+      <option value="Media">Media</option>
+      <option value="Baja">Baja</option>
+    </select>
+    <button type="submit" class="btn-primary">Añadir</button>
+  </form>
+
+  <div class="search-row">
+    <input id="searchInput" type="text" placeholder="Filtrar tareas por texto..." />
+  </div>
+</section>
+
+<section id="taskList" class="grid"></section>
 
       <section class="grid">
 
@@ -162,5 +185,6 @@
 
   </main>
 
+  <script src="app.js"></script>
 </body>
 </html>
