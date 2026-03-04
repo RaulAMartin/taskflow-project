@@ -202,6 +202,7 @@ function addTask(text, category, priority) {
 
   tasks.unshift(newTask);
   saveTasks();
+  syncSearchInputs("");  // limpia ambos buscadores
   render();
 
   taskInput.value = "";
