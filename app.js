@@ -171,7 +171,7 @@ function applyFilters(list) {
 
   return list.filter(t => {
     const matchesText = q === "" || t.text.toLowerCase().includes(q);
-    const matchesPriority = allowed.size === 0 ? false : allowed.has(t.priority);
+    const matchesPriority = allowed.size === 0 ? true : allowed.has(t.priority);
     return matchesText && matchesPriority;
   });
 }
