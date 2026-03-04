@@ -112,19 +112,18 @@ body{
   filter: brightness(1.05);
 }
 
-/* Layout (SIEMPRE 2 columnas) */
+/* Layout PRINCIPAL con GRID (sidebar + contenido SIEMPRE al lado) */
 .layout{
-  display:flex;
+  display: grid;
+  grid-template-columns: 280px 1fr; /* izquierda fija, derecha flexible */
   gap: var(--space);
   padding: 22px;
-  align-items:flex-start;
-  flex-wrap: nowrap;
+  align-items: start;
 }
 
-/* Sidebar: un poco más estrecho para que quepa mejor */
+/* Sidebar */
 .sidebar{
-  width: 260px;
-  flex: 0 0 260px;
+  width: auto;     /* ya lo controla el grid */
   display:flex;
   flex-direction:column;
   gap: var(--space);
@@ -231,10 +230,9 @@ body{
   font-size: 14px;
 }
 
-/* Content */
+/* Contenido */
 .content{
-  flex:1;
-  min-width:0; /* clave */
+  min-width: 0;    /* para que pueda encoger sin romper */
   display:flex;
   flex-direction:column;
   gap: var(--space);
