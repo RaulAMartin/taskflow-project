@@ -403,6 +403,10 @@ tag.active {
   color: var(--text);
   outline: none;
 }
+.task-form select {
+  color: white; /* texto cuando el select está cerrado */
+}
+
 /* Color del texto dentro del desplegable */
 .task-form select option {
   color: black;
