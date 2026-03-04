@@ -1,20 +1,30 @@
-// ===== Taskflow - App JS =====
+// ===== Taskflow - App JS (final) =====
 
-// Elementos del DOM
+// --------- DOM ---------
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
 const taskCategory = document.getElementById("taskCategory");
 const taskPriority = document.getElementById("taskPriority");
 const taskList = document.getElementById("taskList");
+
 const searchInput = document.getElementById("searchInput");
+const topSearchInput = document.getElementById("topSearchInput");
 
-// Clave para LocalStorage
-const STORAGE_KEY = "taskflow_tasks_v1";
+const filterHigh = document.getElementById("filterHigh");
+const filterMid = document.getElementById("filterMid");
+const filterLow = document.getElementById("filterLow");
 
-// Estado (array de tareas)
+const statTotal = document.getElementById("statTotal");
+const statPending = document.getElementById("statPending");
+const statHigh = document.getElementById("statHigh");
+
+// --------- LocalStorage ---------
+const STORAGE_KEY = "taskflow_tasks_v3";
+
+// Estado
 let tasks = [];
 
-// Utilidades LocalStorage
+// --------- Storage helpers ---------
 function saveTasks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
@@ -24,15 +34,94 @@ function loadTasks() {
   tasks = data ? JSON.parse(data) : [];
 }
 
-// Crear HTML de una tarea
+// --------- Seed (3 tareas iniciales) ---------
+function seedTasksIfEmpty() {
+  if (tasks.length > 0) return;
+
+  tasks = [
+    {
+      id: crypto.randomUUID(),
+      text: "Terminar práctica DAM",
+      category: "Estudio",
+      priority: "Alta",
+      done: false,
+      createdAt: Date.now()
+    },
+    {
+      id: crypto.randomUUID(),
+      text: "Revisar correos",
+      category: "Trabajo",
+      priority: "Baja",
+      done: false,
+      createdAt: Date.now()
+    },
+    {
+      id: crypto.randomUUID(),
+      text: "Preparar presentación",
+      category: "Personal",
+      priority: "Media",
+      done: false,
+      createdAt: Date.now()
+    }
+  ];
+
+  saveTasks();
+}
+
+// --------- Seguridad HTML ---------
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// --------- UI helpers ---------
+function getPriorityClass(priority) {
+  if (priority === "Alta") return "high";
+  if (priority === "Media") return "mid";
+  return "low";
+}
+
+function normalizeText(s) {
+  return s.trim().toLowerCase();
+}
+
+// Sincroniza ambos buscadores (arriba y abajo)
+function syncSearchInputs(value) {
+  if (searchInput && searchInput.value !== value) searchInput.value = value;
+  if (topSearchInput && topSearchInput.value !== value) topSearchInput.value = value;
+}
+
+function getSearchText() {
+  const a = topSearchInput ? topSearchInput.value : "";
+  const b = searchInput ? searchInput.value : "";
+  // usamos el que tenga más contenido (por si uno está vacío)
+  return a.length >= b.length ? a : b;
+}
+
+// --------- Stats ---------
+function updateStats() {
+  const total = tasks.length;
+  const pending = tasks.filter(t => !t.done).length;
+  const high = tasks.filter(t => t.priority === "Alta").length;
+
+  if (statTotal) statTotal.textContent = String(total);
+  if (statPending) statPending.textContent = String(pending);
+  if (statHigh) statHigh.textContent = String(high);
+}
+
+// --------- Crear tarjeta DOM ---------
 function createTaskElement(task) {
   const card = document.createElement("article");
   card.className = "task-card";
   card.dataset.id = task.id;
 
-  // prioridad -> clase visual
-  const priorityClass =
-    task.priority === "Alta" ? "high" : task.priority === "Media" ? "mid" : "low";
+  if (task.done) card.classList.add("done");
+
+  const priorityClass = getPriorityClass(task.priority);
 
   card.innerHTML = `
     <div class="task-main">
@@ -45,6 +134,13 @@ function createTaskElement(task) {
     </div>
 
     <div class="task-side">
+      <div class="meta-col">
+        <div class="meta-label muted">Estado</div>
+        <button class="btn-ghost" data-action="toggle">
+          ${task.done ? "Reabrir" : "Completar"}
+        </button>
+      </div>
+
       <div class="meta-col">
         <div class="meta-label muted">Prioridad</div>
         <span class="badge ${priorityClass}">${escapeHtml(task.priority)}</span>
@@ -60,85 +156,130 @@ function createTaskElement(task) {
   return card;
 }
 
-// Pintar todas las tareas
-function renderTasks(filterText = "") {
-  taskList.innerHTML = "";
+// --------- Filtros ---------
+function getAllowedPriorities() {
+  const set = new Set();
+  if (filterHigh?.checked) set.add("Alta");
+  if (filterMid?.checked) set.add("Media");
+  if (filterLow?.checked) set.add("Baja");
+  return set;
+}
 
-  const normalized = filterText.trim().toLowerCase();
+function applyFilters(list) {
+  const q = normalizeText(getSearchText());
+  const allowed = getAllowedPriorities();
 
-  const filtered = tasks.filter((t) =>
-    t.text.toLowerCase().includes(normalized)
-  );
-
-  filtered.forEach((task) => {
-    const el = createTaskElement(task);
-    taskList.appendChild(el);
+  return list.filter(t => {
+    const matchesText = q === "" || t.text.toLowerCase().includes(q);
+    const matchesPriority = allowed.size === 0 ? false : allowed.has(t.priority);
+    return matchesText && matchesPriority;
   });
 }
 
-// Añadir tarea
+// --------- Render ---------
+function render() {
+  const filtered = applyFilters(tasks);
+
+  taskList.innerHTML = "";
+  filtered.forEach(t => taskList.appendChild(createTaskElement(t)));
+
+  updateStats();
+}
+
+// --------- Acciones ---------
 function addTask(text, category, priority) {
+  const clean = text.trim();
+  if (!clean) return;
+
   const newTask = {
     id: crypto.randomUUID(),
-    text: text.trim(),
+    text: clean,
     category,
     priority,
+    done: false,
+    createdAt: Date.now()
   };
 
-  tasks.unshift(newTask); // la metemos al principio
+  tasks.unshift(newTask);
   saveTasks();
-  renderTasks(searchInput.value);
+  render();
 
-  // limpiar input
   taskInput.value = "";
   taskInput.focus();
 }
 
-// Eliminar tarea
-function deleteTask(taskId) {
-  tasks = tasks.filter((t) => t.id !== taskId);
+function toggleDone(taskId) {
+  const t = tasks.find(x => x.id === taskId);
+  if (!t) return;
+
+  t.done = !t.done;
   saveTasks();
-  renderTasks(searchInput.value);
+  render();
 }
 
-// Escape para evitar que se rompa el HTML con caracteres raros
-function escapeHtml(str) {
-  return str
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+function deleteTaskAnimated(taskId, cardEl) {
+  if (cardEl) {
+    cardEl.classList.add("removing");
+    setTimeout(() => {
+      tasks = tasks.filter(t => t.id !== taskId);
+      saveTasks();
+      render();
+    }, 180);
+  } else {
+    tasks = tasks.filter(t => t.id !== taskId);
+    saveTasks();
+    render();
+  }
 }
 
-// ===== Eventos =====
+// --------- Eventos ---------
 
-// 1) Enviar formulario (añadir tarea)
+// Añadir tarea
 taskForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
-  const text = taskInput.value;
-  if (!text.trim()) return;
-
-  addTask(text, taskCategory.value, taskPriority.value);
+  addTask(taskInput.value, taskCategory.value, taskPriority.value);
 });
 
-// 2) Delegación de eventos para eliminar (un listener para toda la lista)
+// Clicks (delegación)
 taskList.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-action='delete']");
+  const btn = e.target.closest("button[data-action]");
   if (!btn) return;
 
   const card = e.target.closest(".task-card");
   if (!card) return;
 
-  deleteTask(card.dataset.id);
+  const id = card.dataset.id;
+  const action = btn.dataset.action;
+
+  if (action === "delete") {
+    deleteTaskAnimated(id, card);
+  } else if (action === "toggle") {
+    toggleDone(id);
+  }
 });
 
-// 3) Bonus: filtro de búsqueda
-searchInput.addEventListener("input", (e) => {
-  renderTasks(e.target.value);
-});
+// Búsqueda inferior
+if (searchInput) {
+  searchInput.addEventListener("input", (e) => {
+    syncSearchInputs(e.target.value);
+    render();
+  });
+}
 
-// ===== Inicio =====
+// Búsqueda superior
+if (topSearchInput) {
+  topSearchInput.addEventListener("input", (e) => {
+    syncSearchInputs(e.target.value);
+    render();
+  });
+}
+
+// Filtros prioridad
+filterHigh?.addEventListener("change", render);
+filterMid?.addEventListener("change", render);
+filterLow?.addEventListener("change", render);
+
+// --------- Inicio ---------
 loadTasks();
-renderTasks();
+seedTasksIfEmpty();
+render();
