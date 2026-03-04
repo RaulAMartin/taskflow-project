@@ -542,3 +542,22 @@ body{
     overflow-x: auto;
   }
 }
+
+/* ===== OVERRIDE: SIEMPRE sidebar izquierda + contenido derecha ===== */
+.layout{
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  flex-wrap: nowrap !important;
+}
+
+.sidebar{
+  flex: 0 0 280px !important;
+  width: 280px !important;
+}
+
+.content{
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
