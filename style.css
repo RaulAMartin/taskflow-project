@@ -117,7 +117,10 @@ body{
   display:flex;
   gap: var(--space);
   padding: 22px;
+   align-items: flex-start; /* ✅ evita rarezas verticales */
+  flex-wrap: nowrap;       /* ✅ evita que baje a otra línea */
 }
+
 
 /* Sidebar */
 .sidebar{
@@ -492,7 +495,7 @@ body{
 }
 
 /* Responsive */
-@media (max-width: 760px){
+@media (max-width: 640px){
   .layout{ flex-direction:column; }
   .sidebar{ width: 100%; }
   .search input{ width: 140px; }
