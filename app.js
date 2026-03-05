@@ -1,5 +1,6 @@
-// ===== Taskflow - App JS =====
+// ===== Taskflow - App JS (Tailwind refactor + Dark mode toggle) =====
 
+// Elementos base
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
 const taskCategory = document.getElementById("taskCategory");
@@ -23,19 +24,24 @@ const pillPersonal = document.getElementById("pillPersonal");
 
 const newTaskBtn = document.getElementById("newTaskBtn");
 
+
+const themeToggle = document.getElementById("themeToggle");
+
 const STORAGE_KEY = "taskflow_tasks_v4";
+const THEME_KEY = "taskflow_theme";
 let tasks = [];
 
-function saveTasks(){
+// ---------- Persistencia ----------
+function saveTasks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-function loadTasks(){
+function loadTasks() {
   const data = localStorage.getItem(STORAGE_KEY);
   tasks = data ? JSON.parse(data) : [];
 }
 
-function seedIfEmpty(){
+function seedIfEmpty() {
   if (tasks.length > 0) return;
 
   tasks = [
@@ -45,7 +51,7 @@ function seedIfEmpty(){
       category: "Estudio",
       priority: "Alta",
       done: false,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     },
     {
       id: crypto.randomUUID(),
@@ -53,7 +59,7 @@ function seedIfEmpty(){
       category: "Trabajo",
       priority: "Baja",
       done: false,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     },
     {
       id: crypto.randomUUID(),
@@ -61,14 +67,15 @@ function seedIfEmpty(){
       category: "Personal",
       priority: "Media",
       done: false,
-      createdAt: Date.now()
-    }
+      createdAt: Date.now(),
+    },
   ];
 
   saveTasks();
 }
 
-function escapeHtml(str){
+// ---------- Seguridad HTML  ----------
+function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -77,24 +84,19 @@ function escapeHtml(str){
     .replaceAll("'", "&#039;");
 }
 
-function priorityClass(p){
-  if (p === "Alta") return "high";
-  if (p === "Media") return "mid";
-  return "low";
-}
-
-function syncSearchInputs(v){
+// ---------- Filtros / búsqueda ----------
+function syncSearchInputs(v) {
   if (searchInput && searchInput.value !== v) searchInput.value = v;
   if (topSearchInput && topSearchInput.value !== v) topSearchInput.value = v;
 }
 
-function getSearchText(){
+function getSearchText() {
   const a = topSearchInput ? topSearchInput.value : "";
   const b = searchInput ? searchInput.value : "";
   return a.length >= b.length ? a : b;
 }
 
-function getAllowedPriorities(){
+function getAllowedPriorities() {
   const set = new Set();
   if (filterHigh?.checked) set.add("Alta");
   if (filterMid?.checked) set.add("Media");
@@ -102,65 +104,130 @@ function getAllowedPriorities(){
   return set;
 }
 
-function applyFilters(list){
+function applyFilters(list) {
   const q = getSearchText().trim().toLowerCase();
   const allowed = getAllowedPriorities();
 
-  return list.filter(t => {
+  return list.filter((t) => {
     const matchesText = q === "" || t.text.toLowerCase().includes(q);
     const matchesPriority = allowed.size === 0 ? false : allowed.has(t.priority);
     return matchesText && matchesPriority;
   });
 }
 
-function updateStats(){
+// ---------- Stats ----------
+function updateStats() {
   const total = tasks.length;
-  const pending = tasks.filter(t => !t.done).length;
-  const urgent = tasks.filter(t => t.priority === "Alta").length;
+  const pending = tasks.filter((t) => !t.done).length;
+  const urgent = tasks.filter((t) => t.priority === "Alta").length;
 
   statTotal.textContent = String(total);
   statPending.textContent = String(pending);
   statHigh.textContent = String(urgent);
 
-  pillStudy.textContent = String(tasks.filter(t => t.category === "Estudio").length);
-  pillWork.textContent = String(tasks.filter(t => t.category === "Trabajo").length);
-  pillPersonal.textContent = String(tasks.filter(t => t.category === "Personal").length);
+  pillStudy.textContent = String(tasks.filter((t) => t.category === "Estudio").length);
+  pillWork.textContent = String(tasks.filter((t) => t.category === "Trabajo").length);
+  pillPersonal.textContent = String(tasks.filter((t) => t.category === "Personal").length);
 }
 
-function createTaskElement(task){
-  const card = document.createElement("article");
-  card.className = "task-card";
-  card.dataset.id = task.id;
-  if (task.done) card.classList.add("done");
+// ---------- Tailwind helpers (nuevos) ----------
+function badgeTailwind(priority) {
+  
+  if (priority === "Alta") return "bg-red-500";
+  if (priority === "Media") return "bg-amber-500";
+  return "bg-emerald-500";
+}
 
-  const pClass = priorityClass(task.priority);
+function createTaskElement(task) {
+  const card = document.createElement("article");
+
+
+  card.className =
+  [
+    "task-card",
+    "overflow-hidden",
+    "rounded-xl border border-slate-200 bg-white p-4 shadow-sm",
+    "transition duration-200",
+    "hover:-translate-y-0.5 hover:shadow-md",
+    "dark:border-slate-800 dark:bg-slate-900",
+    task.done ? "opacity-80" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  card.dataset.id = task.id;
+
+  const titleClass = task.done ? "line-through decoration-2" : "";
+
+  const badgeClass = badgeTailwind(task.priority);
+
 
   card.innerHTML = `
-    <div class="task-main">
-      <div class="task-title">${escapeHtml(task.text)}</div>
-      <div class="task-desc muted">${escapeHtml(task.category)}</div>
-      <div class="task-tags">
-        <span class="tag">${escapeHtml(task.category)}</span>
-        <span class="tag">${escapeHtml(task.priority)}</span>
-      </div>
-    </div>
+    <div class="grid gap-4 md:grid-cols-[1fr_220px]">
+      <!-- Columna principal -->
+      <div class="min-w-0">
+        <div class="text-sm font-extrabold ${titleClass}">
+          ${escapeHtml(task.text)}
+        </div>
 
-    <div class="task-side">
-      <div class="meta-col">
-        <div class="meta-label">Estado</div>
-        <button class="btn-ghost" data-action="toggle">
-          ${task.done ? "Reabrir" : "Completar"}
-        </button>
+        <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">
+          ${escapeHtml(task.category)}
+        </div>
+
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700
+                       dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+            ${escapeHtml(task.category)}
+          </span>
+
+          <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700
+                       dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+            ${escapeHtml(task.priority)}
+          </span>
+        </div>
       </div>
 
-      <div class="meta-col">
-        <div class="meta-label">Prioridad</div>
-        <span class="badge ${pClass}">${escapeHtml(task.priority)}</span>
-      </div>
+      <!-- Panel derecho (acciones/meta) -->
+      <div class="min-w-0 flex flex-col gap-3">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
+                    dark:border-slate-800 dark:bg-slate-950">
+          <div class="mb-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">Estado</div>
 
-      <div class="meta-col">
-        <div class="meta-label">Acciones</div>
-        <button class="btn-danger" data-action="delete">Eliminar</button>
+          <button
+            class="w-full rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-800
+                   hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400
+                   dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-slate-600
+                   transition"
+            data-action="toggle"
+            type="button"
+          >
+            ${task.done ? "Reabrir" : "Completar"}
+          </button>
+        </div>
+
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
+                    dark:border-slate-800 dark:bg-slate-950">
+          <div class="mb-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">Prioridad</div>
+          <span class="inline-flex w-full items-center justify-center rounded-full px-3 py-2 text-xs font-extrabold text-white ${badgeClass}">
+            ${escapeHtml(task.priority)}
+          </span>
+        </div>
+
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
+                    dark:border-slate-800 dark:bg-slate-950">
+          <div class="mb-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">Acciones</div>
+
+          <button
+            class="w-full rounded-full bg-red-500/15 px-3 py-2 text-xs font-extrabold text-red-700
+                   hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400
+                   dark:text-red-200 dark:focus:ring-red-500
+                   transition"
+            data-action="delete"
+            type="button"
+          >
+            Eliminar
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -168,14 +235,17 @@ function createTaskElement(task){
   return card;
 }
 
-function render(){
+function render() {
   taskList.innerHTML = "";
+
   const filtered = applyFilters(tasks);
-  filtered.forEach(t => taskList.appendChild(createTaskElement(t)));
+  filtered.forEach((t) => taskList.appendChild(createTaskElement(t)));
+
   updateStats();
 }
 
-function addTask(text, category, priority){
+// ---------- CRUD ----------
+function addTask(text, category, priority) {
   const clean = text.trim();
   if (!clean) return;
 
@@ -185,40 +255,71 @@ function addTask(text, category, priority){
     category,
     priority,
     done: false,
-    createdAt: Date.now()
+    createdAt: Date.now(),
   });
 
   saveTasks();
-  syncSearchInputs(""); // para que se vea siempre la nueva tarea
+  syncSearchInputs(""); 
   taskInput.value = "";
   taskInput.focus();
   render();
 }
 
-function toggleDone(id){
-  const t = tasks.find(x => x.id === id);
+function toggleDone(id) {
+  const t = tasks.find((x) => x.id === id);
   if (!t) return;
+
   t.done = !t.done;
   saveTasks();
   render();
 }
 
-function deleteTask(id, cardEl){
-  if (cardEl){
-    cardEl.classList.add("removing");
+function deleteTask(id, cardEl) {
+
+  if (cardEl) {
+    cardEl.classList.add("opacity-0", "translate-y-1.5", "pointer-events-none");
     setTimeout(() => {
-      tasks = tasks.filter(t => t.id !== id);
+      tasks = tasks.filter((t) => t.id !== id);
       saveTasks();
       render();
-    }, 180);
+    }, 200); 
   } else {
-    tasks = tasks.filter(t => t.id !== id);
+    tasks = tasks.filter((t) => t.id !== id);
     saveTasks();
     render();
   }
 }
 
-// Eventos
+// ---------- Modo oscuro ----------
+function initThemeToggle() {
+  if (!themeToggle) return;
+
+  const root = document.documentElement;
+
+  function updateIcon() {
+    const isDark = root.classList.contains("dark");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+    themeToggle.setAttribute("aria-label", isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+    themeToggle.setAttribute("title", isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+  }
+
+  // 1) Cargar preferencia guardada
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "dark") root.classList.add("dark");
+  if (saved === "light") root.classList.remove("dark");
+
+  // 2) Pintar icono inicial
+  updateIcon();
+
+  // 3) Toggle
+  themeToggle.addEventListener("click", () => {
+    const isDark = root.classList.toggle("dark");
+    localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+    updateIcon();
+  });
+}
+
+// ---------- Eventos ----------
 taskForm.addEventListener("submit", (e) => {
   e.preventDefault();
   addTask(taskInput.value, taskCategory.value, taskPriority.value);
@@ -238,13 +339,13 @@ taskList.addEventListener("click", (e) => {
   if (action === "delete") deleteTask(id, card);
 });
 
-if (searchInput){
+if (searchInput) {
   searchInput.addEventListener("input", (e) => {
     syncSearchInputs(e.target.value);
     render();
   });
 }
-if (topSearchInput){
+if (topSearchInput) {
   topSearchInput.addEventListener("input", (e) => {
     syncSearchInputs(e.target.value);
     render();
@@ -259,7 +360,8 @@ newTaskBtn?.addEventListener("click", () => {
   taskInput.focus();
 });
 
-// Inicio
+// ---------- Inicio ----------
 loadTasks();
 seedIfEmpty();
+initThemeToggle();
 render();

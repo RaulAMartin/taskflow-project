@@ -1,145 +1,267 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Taskflow</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taskflow</title>
+
+
+  <link rel="stylesheet" href="./dist/output.css" />
 </head>
-<body>
 
-<header class="topbar">
-<div class="brand">
-<div class="logo" aria-hidden="true"></div>
-<div class="brand-text">
-<h1>Taskflow</h1>
-<p>Organiza tu día con claridad</p>
-</div>
-</div>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+  <!-- TOP BAR -->
+  <header class="border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/60">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <!-- Logo "placeholder" -->
+        <div class="h-10 w-10 rounded-xl bg-slate-900/10 dark:bg-slate-100/10" aria-hidden="true"></div>
 
-<div class="actions">
-<div class="search">
-<span class="search-icon" aria-hidden="true">⌕</span>
-<input id="topSearchInput" type="text" placeholder="Buscar tareas..." />
-</div>
-<button id="newTaskBtn" class="btn-primary" type="button">+ Nueva tarea</button>
-</div>
-</header>
+        <div class="leading-tight">
+          <h1 class="text-lg font-semibold tracking-tight">Taskflow</h1>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Organiza tu día con claridad</p>
+        </div>
+      </div>
 
-<!-- Importante: wrapper para permitir scroll horizontal si la ventana es estrecha -->
-<div class="page-wrap">
-<main class="layout">
-<aside class="sidebar">
-<section class="panel">
-<h2>Resumen</h2>
-<div class="stats">
-<div class="stat">
-<div class="stat-value" id="statTotal">0</div>
-<div class="stat-label">Totales</div>
-</div>
-<div class="stat">
-<div class="stat-value" id="statPending">0</div>
-<div class="stat-label">Pendientes</div>
-</div>
-<div class="stat">
-<div class="stat-value" id="statHigh">0</div>
-<div class="stat-label">Urgentes</div>
-</div>
-</div>
-</section>
+      <!-- Actions -->
+<div class="flex items-center gap-3">
 
-<section class="panel">
-<h2>Categorías</h2>
-<ul class="cat-list">
-<li class="cat-item">
-<span class="left">
-<span class="dot dot-study"></span>
-<span>Estudio</span>
-</span>
-<span class="pill" id="pillStudy">0</span>
-</li>
+  <!-- Search -->
+  <div class="relative hidden sm:block">
+    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true">⌕</span>
+    <input
+      id="topSearchInput"
+      type="text"
+      placeholder="Buscar tareas..."
+      class="w-64 rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm
+             placeholder:text-slate-400
+             focus:outline-none focus:ring-2 focus:ring-slate-400
+             dark:border-slate-800 dark:bg-slate-900 dark:placeholder:text-slate-500 dark:focus:ring-slate-600
+             transition"
+    />
+  </div>
 
-<li class="cat-item">
-<span class="left">
-<span class="dot dot-work"></span>
-<span>Trabajo</span>
-</span>
-<span class="pill" id="pillWork">0</span>
-</li>
+  <!-- Dark mode toggle -->
+  <button
+    id="themeToggle"
+    type="button"
+    class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium
+           hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400
+           dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 dark:focus:ring-slate-600
+           transition"
+    aria-label="Cambiar tema"
+    title="Cambiar tema"
+  >
+    🌙
+  </button>
 
-<li class="cat-item">
-<span class="left">
-<span class="dot dot-personal"></span>
-<span>Personal</span>
-</span>
-<span class="pill" id="pillPersonal">0</span>
-</li>
-</ul>
-</section>
-
-<section class="panel">
-<h2>Filtros</h2>
-<div class="filters">
-<label class="check">
-<input id="filterHigh" type="checkbox" checked />
-<span>Mostrar alta prioridad</span>
-</label>
-<label class="check">
-<input id="filterMid" type="checkbox" checked />
-<span>Mostrar media prioridad</span>
-</label>
-<label class="check">
-<input id="filterLow" type="checkbox" checked />
-<span>Mostrar baja prioridad</span>
-</label>
-</div>
-</section>
-</aside>
-
-<section class="content">
-<header class="content-head">
-<div>
-<h2>Mis tareas</h2>
-<p class="muted">Añade, completa y elimina tareas (se guardan en tu navegador).</p>
 </div>
 
-<div class="segmented" aria-label="Vistas">
-<button class="seg active" type="button">Todas</button>
-<button class="seg" type="button">Hoy</button>
-<button class="seg" type="button">Semana</button>
-</div>
-</header>
+        <!-- New Task -->
+        <button
+          id="newTaskBtn"
+          type="button"
+          class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white
+                 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400
+                 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:focus:ring-slate-600
+                 transition"
+        >
+          + Nueva tarea
+        </button>
+      </div>
+    </div>
 
-<section class="composer">
-<form id="taskForm" class="task-form">
-<input id="taskInput" type="text" placeholder="Escribe una tarea y pulsa Enter..." required />
+    <!-- Search móvil (aparece en pantallas pequeñas) -->
+    <div class="sm:hidden px-4 pb-4">
+      <div class="relative">
+        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true">⌕</span>
+        <input
+          id="topSearchInputMobile"
+          type="text"
+          placeholder="Buscar tareas..."
+          class="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm
+                 placeholder:text-slate-400
+                 focus:outline-none focus:ring-2 focus:ring-slate-400
+                 dark:border-slate-800 dark:bg-slate-900 dark:placeholder:text-slate-500 dark:focus:ring-slate-600
+                 transition"
+        />
+      </div>
+      
+    </div>
+  </header>
 
-<select id="taskCategory" aria-label="Categoría">
-<option value="Estudio">Estudio</option>
-<option value="Trabajo">Trabajo</option>
-<option value="Personal">Personal</option>
-</select>
+  <!-- WRAP (scroll horizontal si hace falta) -->
+  <div class="overflow-x-auto">
+    <main class="mx-auto grid min-w-[900px] max-w-6xl grid-cols-12 gap-4 px-4 py-6">
+      <!-- SIDEBAR -->
+      <aside class="col-span-4 lg:col-span-3 space-y-4">
+        <!-- Resumen -->
+        <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Resumen</h2>
 
-<select id="taskPriority" aria-label="Prioridad">
-<option value="Alta">Alta</option>
-<option value="Media">Media</option>
-<option value="Baja">Baja</option>
-</select>
+          <div class="mt-3 grid grid-cols-3 gap-3">
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+              <div class="text-xl font-semibold" id="statTotal">0</div>
+              <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Totales</div>
+            </div>
 
-<button type="submit" class="btn-primary">Añadir</button>
-</form>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+              <div class="text-xl font-semibold" id="statPending">0</div>
+              <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Pendientes</div>
+            </div>
 
-<div class="search-row">
-<input id="searchInput" type="text" placeholder="Filtrar tareas por texto..." />
-</div>
-</section>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+              <div class="text-xl font-semibold" id="statHigh">0</div>
+              <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Urgentes</div>
+            </div>
+          </div>
+        </section>
 
-<section id="taskList" class="grid"></section>
-</section>
+        <!-- Categorías -->
+        <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 class="text-sm font-semibold">Categorías</h2>
 
-</main>
-</div>
+          <ul class="mt-3 space-y-2">
+            <li class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+              <span class="flex items-center gap-2 text-sm">
+                <span class="h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
+                <span>Estudio</span>
+              </span>
+              <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillStudy">0</span>
+            </li>
 
-<script src="app.js"></script>
+            <li class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+              <span class="flex items-center gap-2 text-sm">
+                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                <span>Trabajo</span>
+              </span>
+              <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillWork">0</span>
+            </li>
+
+            <li class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+              <span class="flex items-center gap-2 text-sm">
+                <span class="h-2.5 w-2.5 rounded-full bg-pink-500"></span>
+                <span>Personal</span>
+              </span>
+              <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillPersonal">0</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Filtros -->
+        <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 class="text-sm font-semibold">Filtros</h2>
+
+          <div class="mt-3 space-y-2 text-sm">
+            <label class="flex items-center gap-2">
+              <input id="filterHigh" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
+              <span class="text-slate-700 dark:text-slate-300">Mostrar alta prioridad</span>
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input id="filterMid" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
+              <span class="text-slate-700 dark:text-slate-300">Mostrar media prioridad</span>
+            </label>
+
+            <label class="flex items-center gap-2">
+              <input id="filterLow" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
+              <span class="text-slate-700 dark:text-slate-300">Mostrar baja prioridad</span>
+            </label>
+          </div>
+        </section>
+      </aside>
+
+      <!-- CONTENT -->
+      <section class="col-span-8 lg:col-span-9 space-y-4">
+        <header class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-base font-semibold">Mis tareas</h2>
+            <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+              Añade, completa y elimina tareas (se guardan en tu navegador).
+            </p>
+          </div>
+
+          <!-- Segmented -->
+          <div class="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-950" aria-label="Vistas">
+            <button class="rounded-md bg-white px-3 py-1.5 text-sm font-medium shadow-sm dark:bg-slate-900 transition" type="button">Todas</button>
+            <button class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-900 transition" type="button">Hoy</button>
+            <button class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-900 transition" type="button">Semana</button>
+          </div>
+        </header>
+
+        <!-- Composer -->
+        <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <form id="taskForm" class="grid gap-3 md:grid-cols-12">
+            <input
+              id="taskInput"
+              type="text"
+              placeholder="Escribe una tarea y pulsa Enter..."
+              required
+              class="md:col-span-6 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm
+                     placeholder:text-slate-400
+                     focus:outline-none focus:ring-2 focus:ring-slate-400
+                     dark:border-slate-800 dark:bg-slate-950 dark:placeholder:text-slate-500 dark:focus:ring-slate-600
+                     transition"
+            />
+
+            <select
+              id="taskCategory"
+              aria-label="Categoría"
+              class="md:col-span-3 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-slate-400
+                     dark:border-slate-800 dark:bg-slate-950 dark:focus:ring-slate-600
+                     transition"
+            >
+              <option value="Estudio">Estudio</option>
+              <option value="Trabajo">Trabajo</option>
+              <option value="Personal">Personal</option>
+            </select>
+
+            <select
+              id="taskPriority"
+              aria-label="Prioridad"
+              class="md:col-span-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-slate-400
+                     dark:border-slate-800 dark:bg-slate-950 dark:focus:ring-slate-600
+                     transition"
+            >
+              <option value="Alta">Alta</option>
+              <option value="Media">Media</option>
+              <option value="Baja">Baja</option>
+            </select>
+
+            <button
+  type="submit"
+  class="md:col-span-2 w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white
+         hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400
+         dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:focus:ring-slate-600
+         transition"
+>
+  Añadir
+</button>
+          </form>
+
+          <div class="mt-3">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Filtrar tareas por texto..."
+              class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm
+                     placeholder:text-slate-400
+                     focus:outline-none focus:ring-2 focus:ring-slate-400
+                     dark:border-slate-800 dark:bg-slate-950 dark:placeholder:text-slate-500 dark:focus:ring-slate-600
+                     transition"
+            />
+          </div>
+        </section>
+
+        <!-- Task list grid -->
+        <section id="taskList" class="flex flex-col gap-3"></section>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
