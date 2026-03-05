@@ -1,193 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Taskflow Project</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Taskflow</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <div class="brand-text">
-        <h1>Taskflow</h1>
-        <p>Organiza tu día con claridad</p>
-      </div>
-    </div>
-
-    <div class="actions">
-      <div class="search">
-        <span class="search-icon" aria-hidden="true">⌕</span>
-        <input type="text" placeholder="Buscar tareas..." />
-      </div>
-      <button class="btn-primary">+ Nueva tarea</button>
-    </div>
-  </header>
-
-  <main class="layout">
-
-    <aside class="sidebar">
-      <section class="panel">
-        <h2>Resumen</h2>
-        <div class="stats">
-  <div class="stat">
-    <div class="stat-value" id="statTotal">0</div>
-    <div class="stat-label">Totales</div>
-  </div>
-
-  <div class="stat">
-    <div class="stat-value" id="statPending">0</div>
-    <div class="stat-label">Pendientes</div>
-  </div>
-
-  <div class="stat">
-    <div class="stat-value" id="statHigh">0</div>
-    <div class="stat-label">Urgentes</div>
-  </div>
+<header class="topbar">
+<div class="brand">
+<div class="logo" aria-hidden="true"></div>
+<div class="brand-text">
+<h1>Taskflow</h1>
+<p>Organiza tu día con claridad</p>
 </div>
-      </section>
+</div>
 
-      <section class="panel">
-        <h2>Categorías</h2>
-        <ul class="cat-list">
-          <li class="cat-item active"><span class="dot dot-study"></span> Estudio <span class="pill" id="pillStudy">0</span></li>
-          <li class="cat-item"><span class="dot dot-work"></span> Trabajo <span class="pill" id="pillWork">0</span></li>
-          <li class="cat-item"><span class="dot dot-personal"></span> Personal <span class="pill" id="pillPersonal">0</span></li>
-        </ul>
-      </section>
+<div class="actions">
+<div class="search">
+<span class="search-icon" aria-hidden="true">⌕</span>
+<input id="topSearchInput" type="text" placeholder="Buscar tareas..." />
+</div>
+<button id="newTaskBtn" class="btn-primary" type="button">+ Nueva tarea</button>
+</div>
+</header>
 
-      <section class="panel">
-  <h2>Filtros</h2>
-  <div class="filters">
-    <label class="check">
-      <input id="filterHigh" type="checkbox" checked />
-      <span>Mostrar alta prioridad</span>
-    </label>
-
-    <label class="check">
-      <input id="filterMid" type="checkbox" checked />
-      <span>Mostrar media prioridad</span>
-    </label>
-
-    <label class="check">
-      <input id="filterLow" type="checkbox" checked />
-      <span>Mostrar baja prioridad</span>
-    </label>
-  </div>
+<!-- Importante: wrapper para permitir scroll horizontal si la ventana es estrecha -->
+<div class="page-wrap">
+<main class="layout">
+<aside class="sidebar">
+<section class="panel">
+<h2>Resumen</h2>
+<div class="stats">
+<div class="stat">
+<div class="stat-value" id="statTotal">0</div>
+<div class="stat-label">Totales</div>
+</div>
+<div class="stat">
+<div class="stat-value" id="statPending">0</div>
+<div class="stat-label">Pendientes</div>
+</div>
+<div class="stat">
+<div class="stat-value" id="statHigh">0</div>
+<div class="stat-label">Urgentes</div>
+</div>
+</div>
 </section>
 
-    <section class="content">
-      <header class="content-head">
-        <div>
-          <h2>Mis tareas</h2>
-          <p class="muted">Maqueta responsive con HTML + CSS</p>
-        </div>
-        <div class="segmented">
-          <button class="seg active">Todas</button>
-          <button class="seg">Hoy</button>
-          <button class="seg">Semana</button>
-        </div>
-      </header>
-      
-      <section class="composer">
-  <form id="taskForm" class="task-form">
-    <input id="taskInput" type="text" placeholder="Escribe una tarea y pulsa Enter..." required />
-    <select id="taskCategory">
-      <option value="Estudio">Estudio</option>
-      <option value="Trabajo">Trabajo</option>
-      <option value="Personal">Personal</option>
-    </select>
-    <select id="taskPriority">
-      <option value="Alta">Alta</option>
-      <option value="Media">Media</option>
-      <option value="Baja">Baja</option>
-    </select>
-    <button type="submit" class="btn-primary">Añadir</button>
-  </form>
+<section class="panel">
+<h2>Categorías</h2>
+<ul class="cat-list">
+<li class="cat-item">
+<span class="left">
+<span class="dot dot-study"></span>
+<span>Estudio</span>
+</span>
+<span class="pill" id="pillStudy">0</span>
+</li>
 
-  <div class="search-row">
-    <input id="searchInput" type="text" placeholder="Filtrar tareas por texto..." />
-  </div>
+<li class="cat-item">
+<span class="left">
+<span class="dot dot-work"></span>
+<span>Trabajo</span>
+</span>
+<span class="pill" id="pillWork">0</span>
+</li>
+
+<li class="cat-item">
+<span class="left">
+<span class="dot dot-personal"></span>
+<span>Personal</span>
+</span>
+<span class="pill" id="pillPersonal">0</span>
+</li>
+</ul>
+</section>
+
+<section class="panel">
+<h2>Filtros</h2>
+<div class="filters">
+<label class="check">
+<input id="filterHigh" type="checkbox" checked />
+<span>Mostrar alta prioridad</span>
+</label>
+<label class="check">
+<input id="filterMid" type="checkbox" checked />
+<span>Mostrar media prioridad</span>
+</label>
+<label class="check">
+<input id="filterLow" type="checkbox" checked />
+<span>Mostrar baja prioridad</span>
+</label>
+</div>
+</section>
+</aside>
+
+<section class="content">
+<header class="content-head">
+<div>
+<h2>Mis tareas</h2>
+<p class="muted">Añade, completa y elimina tareas (se guardan en tu navegador).</p>
+</div>
+
+<div class="segmented" aria-label="Vistas">
+<button class="seg active" type="button">Todas</button>
+<button class="seg" type="button">Hoy</button>
+<button class="seg" type="button">Semana</button>
+</div>
+</header>
+
+<section class="composer">
+<form id="taskForm" class="task-form">
+<input id="taskInput" type="text" placeholder="Escribe una tarea y pulsa Enter..." required />
+
+<select id="taskCategory" aria-label="Categoría">
+<option value="Estudio">Estudio</option>
+<option value="Trabajo">Trabajo</option>
+<option value="Personal">Personal</option>
+</select>
+
+<select id="taskPriority" aria-label="Prioridad">
+<option value="Alta">Alta</option>
+<option value="Media">Media</option>
+<option value="Baja">Baja</option>
+</select>
+
+<button type="submit" class="btn-primary">Añadir</button>
+</form>
+
+<div class="search-row">
+<input id="searchInput" type="text" placeholder="Filtrar tareas por texto..." />
+</div>
 </section>
 
 <section id="taskList" class="grid"></section>
+</section>
 
-      <section class="grid">
+</main>
+</div>
 
-        <article class="task-card">
-          <div class="task-main">
-            <div class="task-title">Terminar práctica DAM</div>
-            <div class="task-desc muted">Estructura HTML + CSS, responsive y deploy en Vercel.</div>
-            <div class="task-tags">
-              <span class="tag tag-study">Estudio</span>
-              <span class="tag tag-soft">Frontend</span>
-              <span class="tag tag-soft">Responsive</span>
-            </div>
-          </div>
-
-          <div class="task-side">
-            <div class="meta-col">
-              <div class="meta-label muted">Prioridad</div>
-              <span class="badge high">Alta</span>
-            </div>
-            <div class="meta-col">
-              <div class="meta-label muted">Vence</div>
-              <span class="badge neutral">Hoy</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="task-card">
-          <div class="task-main">
-            <div class="task-title">Revisar correos</div>
-            <div class="task-desc muted">Responder mensajes y dejar bandeja a cero.</div>
-            <div class="task-tags">
-              <span class="tag tag-work">Trabajo</span>
-              <span class="tag tag-soft">Comunicación</span>
-            </div>
-          </div>
-
-          <div class="task-side">
-            <div class="meta-col">
-              <div class="meta-label muted">Prioridad</div>
-              <span class="badge low">Baja</span>
-            </div>
-            <div class="meta-col">
-              <div class="meta-label muted">Vence</div>
-              <span class="badge neutral">Mañana</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="task-card">
-          <div class="task-main">
-            <div class="task-title">Preparar presentación</div>
-            <div class="task-desc muted">Dejar capturas y explicación en el README.</div>
-            <div class="task-tags">
-              <span class="tag tag-personal">Personal</span>
-              <span class="tag tag-soft">Documentación</span>
-            </div>
-          </div>
-
-          <div class="task-side">
-            <div class="meta-col">
-              <div class="meta-label muted">Prioridad</div>
-              <span class="badge mid">Media</span>
-            </div>
-            <div class="meta-col">
-              <div class="meta-label muted">Vence</div>
-              <span class="badge neutral">Viernes</span>
-            </div>
-          </div>
-        </article>
-
-      </section>
-    </section>
-
-  </main>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

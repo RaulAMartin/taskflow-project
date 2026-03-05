@@ -1,6 +1,5 @@
-// ===== Taskflow - App JS (final) =====
+// ===== Taskflow - App JS =====
 
-// --------- DOM ---------
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
 const taskCategory = document.getElementById("taskCategory");
@@ -22,30 +21,27 @@ const pillStudy = document.getElementById("pillStudy");
 const pillWork = document.getElementById("pillWork");
 const pillPersonal = document.getElementById("pillPersonal");
 
-// --------- LocalStorage ---------
-const STORAGE_KEY = "taskflow_tasks_v3";
+const newTaskBtn = document.getElementById("newTaskBtn");
 
-// Estado
+const STORAGE_KEY = "taskflow_tasks_v4";
 let tasks = [];
 
-// --------- Storage helpers ---------
-function saveTasks() {
+function saveTasks(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-function loadTasks() {
+function loadTasks(){
   const data = localStorage.getItem(STORAGE_KEY);
   tasks = data ? JSON.parse(data) : [];
 }
 
-// --------- Seed (3 tareas iniciales) ---------
-function seedTasksIfEmpty() {
+function seedIfEmpty(){
   if (tasks.length > 0) return;
 
   tasks = [
     {
       id: crypto.randomUUID(),
-      text: "Terminar práctica DAM",
+      text: "Terminar el proyecto",
       category: "Estudio",
       priority: "Alta",
       done: false,
@@ -72,8 +68,7 @@ function seedTasksIfEmpty() {
   saveTasks();
 }
 
-// --------- Seguridad HTML ---------
-function escapeHtml(str) {
+function escapeHtml(str){
   return String(str)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -82,85 +77,89 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-// --------- UI helpers ---------
-function getPriorityClass(priority) {
-  if (priority === "Alta") return "high";
-  if (priority === "Media") return "mid";
+function priorityClass(p){
+  if (p === "Alta") return "high";
+  if (p === "Media") return "mid";
   return "low";
 }
 
-function normalizeText(s) {
-  return s.trim().toLowerCase();
+function syncSearchInputs(v){
+  if (searchInput && searchInput.value !== v) searchInput.value = v;
+  if (topSearchInput && topSearchInput.value !== v) topSearchInput.value = v;
 }
 
-// Sincroniza ambos buscadores (arriba y abajo)
-function syncSearchInputs(value) {
-  if (searchInput && searchInput.value !== value) searchInput.value = value;
-  if (topSearchInput && topSearchInput.value !== value) topSearchInput.value = value;
-}
-
-function getSearchText() {
+function getSearchText(){
   const a = topSearchInput ? topSearchInput.value : "";
   const b = searchInput ? searchInput.value : "";
-  // usamos el que tenga más contenido (por si uno está vacío)
   return a.length >= b.length ? a : b;
 }
 
-// --------- Stats ---------
-function updateStats() {
-  const total = tasks.length;
-  const pending = tasks.filter(t => !t.done).length;
-  const high = tasks.filter(t => t.priority === "Alta").length;
-
-  if (statTotal) statTotal.textContent = String(total);
-  if (statPending) statPending.textContent = String(pending);
-  if (statHigh) statHigh.textContent = String(high);
-
-  // ---- contadores por categoría (TOTAL por categoría) ----
-  const studyCount = tasks.filter(t => t.category === "Estudio").length;
-  const workCount = tasks.filter(t => t.category === "Trabajo").length;
-  const personalCount = tasks.filter(t => t.category === "Personal").length;
-
-  if (pillStudy) pillStudy.textContent = String(studyCount);
-  if (pillWork) pillWork.textContent = String(workCount);
-  if (pillPersonal) pillPersonal.textContent = String(personalCount);
+function getAllowedPriorities(){
+  const set = new Set();
+  if (filterHigh?.checked) set.add("Alta");
+  if (filterMid?.checked) set.add("Media");
+  if (filterLow?.checked) set.add("Baja");
+  return set;
 }
 
-// --------- Crear tarjeta DOM ---------
-function createTaskElement(task) {
+function applyFilters(list){
+  const q = getSearchText().trim().toLowerCase();
+  const allowed = getAllowedPriorities();
+
+  return list.filter(t => {
+    const matchesText = q === "" || t.text.toLowerCase().includes(q);
+    const matchesPriority = allowed.size === 0 ? false : allowed.has(t.priority);
+    return matchesText && matchesPriority;
+  });
+}
+
+function updateStats(){
+  const total = tasks.length;
+  const pending = tasks.filter(t => !t.done).length;
+  const urgent = tasks.filter(t => t.priority === "Alta").length;
+
+  statTotal.textContent = String(total);
+  statPending.textContent = String(pending);
+  statHigh.textContent = String(urgent);
+
+  pillStudy.textContent = String(tasks.filter(t => t.category === "Estudio").length);
+  pillWork.textContent = String(tasks.filter(t => t.category === "Trabajo").length);
+  pillPersonal.textContent = String(tasks.filter(t => t.category === "Personal").length);
+}
+
+function createTaskElement(task){
   const card = document.createElement("article");
   card.className = "task-card";
   card.dataset.id = task.id;
-
   if (task.done) card.classList.add("done");
 
-  const priorityClass = getPriorityClass(task.priority);
+  const pClass = priorityClass(task.priority);
 
   card.innerHTML = `
     <div class="task-main">
       <div class="task-title">${escapeHtml(task.text)}</div>
       <div class="task-desc muted">${escapeHtml(task.category)}</div>
       <div class="task-tags">
-        <span class="tag tag-soft">${escapeHtml(task.category)}</span>
-        <span class="tag tag-soft">${escapeHtml(task.priority)}</span>
+        <span class="tag">${escapeHtml(task.category)}</span>
+        <span class="tag">${escapeHtml(task.priority)}</span>
       </div>
     </div>
 
     <div class="task-side">
       <div class="meta-col">
-        <div class="meta-label muted">Estado</div>
+        <div class="meta-label">Estado</div>
         <button class="btn-ghost" data-action="toggle">
           ${task.done ? "Reabrir" : "Completar"}
         </button>
       </div>
 
       <div class="meta-col">
-        <div class="meta-label muted">Prioridad</div>
-        <span class="badge ${priorityClass}">${escapeHtml(task.priority)}</span>
+        <div class="meta-label">Prioridad</div>
+        <span class="badge ${pClass}">${escapeHtml(task.priority)}</span>
       </div>
 
       <div class="meta-col">
-        <div class="meta-label muted">Acciones</div>
+        <div class="meta-label">Acciones</div>
         <button class="btn-danger" data-action="delete">Eliminar</button>
       </div>
     </div>
@@ -169,98 +168,62 @@ function createTaskElement(task) {
   return card;
 }
 
-// --------- Filtros ---------
-function getAllowedPriorities() {
-  if (!filterHigh && !filterMid && !filterLow) {
-    return new Set(["Alta", "Media", "Baja"]);
-  }
-
-  const set = new Set();
-  if (filterHigh?.checked) set.add("Alta");
-  if (filterMid?.checked) set.add("Media");
-  if (filterLow?.checked) set.add("Baja");
-
-  // Si el usuario desmarca los 3, entonces NO se muestra nada (como filtro real)
-  return set;
-}
-
-function applyFilters(list) {
-  const q = normalizeText(getSearchText());
-  const allowed = getAllowedPriorities();
-
-  return list.filter(t => {
-    const matchesText = q === "" || t.text.toLowerCase().includes(q);
-    const matchesPriority = allowed.size === 0 ? true : allowed.has(t.priority);
-    return matchesText && matchesPriority;
-  });
-}
-
-// --------- Render ---------
-function render() {
-  const filtered = applyFilters(tasks);
-
+function render(){
   taskList.innerHTML = "";
+  const filtered = applyFilters(tasks);
   filtered.forEach(t => taskList.appendChild(createTaskElement(t)));
-
   updateStats();
 }
 
-// --------- Acciones ---------
-function addTask(text, category, priority) {
+function addTask(text, category, priority){
   const clean = text.trim();
   if (!clean) return;
 
-  const newTask = {
+  tasks.unshift({
     id: crypto.randomUUID(),
     text: clean,
     category,
     priority,
     done: false,
     createdAt: Date.now()
-  };
+  });
 
-  tasks.unshift(newTask);
   saveTasks();
-  syncSearchInputs("");  // limpia ambos buscadores
-  render();
-
+  syncSearchInputs(""); // para que se vea siempre la nueva tarea
   taskInput.value = "";
   taskInput.focus();
+  render();
 }
 
-function toggleDone(taskId) {
-  const t = tasks.find(x => x.id === taskId);
+function toggleDone(id){
+  const t = tasks.find(x => x.id === id);
   if (!t) return;
-
   t.done = !t.done;
   saveTasks();
   render();
 }
 
-function deleteTaskAnimated(taskId, cardEl) {
-  if (cardEl) {
+function deleteTask(id, cardEl){
+  if (cardEl){
     cardEl.classList.add("removing");
     setTimeout(() => {
-      tasks = tasks.filter(t => t.id !== taskId);
+      tasks = tasks.filter(t => t.id !== id);
       saveTasks();
       render();
     }, 180);
   } else {
-    tasks = tasks.filter(t => t.id !== taskId);
+    tasks = tasks.filter(t => t.id !== id);
     saveTasks();
     render();
   }
 }
 
-// --------- Eventos ---------
-
-// Añadir tarea
+// Eventos
 taskForm.addEventListener("submit", (e) => {
   e.preventDefault();
   addTask(taskInput.value, taskCategory.value, taskPriority.value);
 });
 
-// Clicks (delegación)
 taskList.addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-action]");
   if (!btn) return;
@@ -271,35 +234,32 @@ taskList.addEventListener("click", (e) => {
   const id = card.dataset.id;
   const action = btn.dataset.action;
 
-  if (action === "delete") {
-    deleteTaskAnimated(id, card);
-  } else if (action === "toggle") {
-    toggleDone(id);
-  }
+  if (action === "toggle") toggleDone(id);
+  if (action === "delete") deleteTask(id, card);
 });
 
-// Búsqueda inferior
-if (searchInput) {
+if (searchInput){
   searchInput.addEventListener("input", (e) => {
     syncSearchInputs(e.target.value);
     render();
   });
 }
-
-// Búsqueda superior
-if (topSearchInput) {
+if (topSearchInput){
   topSearchInput.addEventListener("input", (e) => {
     syncSearchInputs(e.target.value);
     render();
   });
 }
 
-// Filtros prioridad
 filterHigh?.addEventListener("change", render);
 filterMid?.addEventListener("change", render);
 filterLow?.addEventListener("change", render);
 
-// --------- Inicio ---------
+newTaskBtn?.addEventListener("click", () => {
+  taskInput.focus();
+});
+
+// Inicio
 loadTasks();
-seedTasksIfEmpty();
+seedIfEmpty();
 render();
