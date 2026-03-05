@@ -112,35 +112,21 @@ body{
   filter: brightness(1.05);
 }
 
-/* Layout principal: izquierda/derecha */
+/* Layout PRINCIPAL con GRID (sidebar + contenido SIEMPRE al lado) */
 .layout{
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 280px 1fr; /* izquierda fija, derecha flexible */
   gap: var(--space);
   padding: 22px;
   align-items: start;
 }
 
+/* Sidebar */
 .sidebar{
-  width: auto;
+  width: auto;     /* ya lo controla el grid */
   display:flex;
   flex-direction:column;
   gap: var(--space);
-}
-
-.content{
-  min-width: 0;
-  display:flex;
-  flex-direction:column;
-  gap: var(--space);
-}
-
-/* Ajuste de ancho sidebar en pantallas medias */
-@media (max-width: 1100px){
-  .layout{ grid-template-columns: 240px 1fr; }
-}
-@media (max-width: 950px){
-  .layout{ grid-template-columns: 220px 1fr; }
 }
 
 .panel{
@@ -244,7 +230,14 @@ body{
   font-size: 14px;
 }
 
-/* Cabecera contenido */
+/* Contenido */
+.content{
+  min-width:0;    /* para que pueda encoger sin romper */
+  display:flex;
+  flex-direction:column;
+  gap: var(--space);
+}
+
 .content-head{
   display:flex;
   align-items:flex-end;
@@ -333,27 +326,26 @@ body{
   outline: none;
 }
 
-/* Grid lista */
+/* Grid */
 .grid{
   display:flex;
   flex-direction:column;
   gap: 14px;
 }
 
-/* Tarjetas */
+/* Task Card */
 .task-card{
   background: var(--surface-2);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: var(--radius);
   padding: 16px;
   box-shadow: var(--shadow);
-
-  display: grid;
-  grid-template-columns: 1fr 320px; /* panel derecho fijo */
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   gap: 14px;
-  align-items: center;
-
   min-width: 0;
+
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease;
 }
 
@@ -363,15 +355,15 @@ body{
   border-color: rgba(124,58,237,0.28);
 }
 
-/* completada */
-.task-card.done{ opacity: 0.78; }
+.task-card.done{
+  opacity: 0.75;
+}
 .task-card.done .task-title{
   text-decoration: line-through;
   text-decoration-thickness: 2px;
   opacity: 0.9;
 }
 
-/* animación borrado */
 .task-card.removing{
   opacity: 0;
   transform: translateY(6px);
@@ -420,56 +412,54 @@ body{
 
 .tag-soft{ color: #4b5563; }
 
-/* Panel derecho (3 columnas compactas) */
+/* Columna derecha: compacta y con wrap para que no empuje */
 .task-side{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display:flex;
   gap: 10px;
-  align-items: center;
-  justify-items: stretch;
+  align-items:center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .meta-col{
-  width: 100%;
+  width: 108px;     /* ✅ más estrecho */
   text-align:center;
 }
 
 .meta-label{
-  font-size: 11px;
+  font-size: 12px;
   margin-bottom: 6px;
-  color: var(--muted);
 }
 
-/* Badges compactos */
+/* Badges */
 .badge{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width: 100%;
-  padding: 7px 10px;
+  min-width: 74px;
+  padding: 6px 10px;
   border-radius: 999px;
   font-weight: 900;
-  font-size: 12px;
   color: white;
+  font-size: 13px;
 }
 
 .badge.high{ background: var(--high); }
 .badge.mid{ background: var(--mid); }
 .badge.low{ background: var(--low); }
+
 .badge.neutral{
   background: rgba(255,255,255,0.10);
   color: var(--text);
 }
 
-/* Botones compactos (no empujan) */
+/* Botones (más pequeños para que no rompan el layout) */
 .btn-danger,
 .btn-ghost{
-  width: 100%;
   border-radius: 999px;
-  padding: 8px 10px;
+  padding: 7px 10px;   /* ✅ más pequeño */
   font-weight: 900;
-  font-size: 12px;
-  line-height: 1;
+  font-size: 12px;     /* ✅ más pequeño */
   cursor: pointer;
   transition: transform .18s ease, filter .18s ease, background .18s ease;
 }
@@ -479,6 +469,7 @@ body{
   background: rgba(239,68,68,0.18);
   color: #fff;
 }
+
 .btn-danger:hover{
   transform: translateY(-1px);
   filter: brightness(1.12);
@@ -489,45 +480,41 @@ body{
   background: rgba(255,255,255,0.06);
   color: var(--text);
 }
+
 .btn-ghost:hover{
   transform: translateY(-1px);
   background: rgba(255,255,255,0.10);
 }
 
-/* Responsive: la tarjeta se vuelve 1 columna, pero el layout principal sigue en 2 columnas */
-@media (max-width: 900px){
-  .task-card{
-    grid-template-columns: 1fr;
-  }
-  .task-side{
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Topbar responsive */
+/* Ajuste SOLO para topbar en pantallas pequeñas (sin cambiar layout principal) */
 @media (max-width: 600px){
   .topbar{
     flex-direction:column;
     align-items:stretch;
   }
+
   .actions{
     justify-content:space-between;
   }
+
   .search input{
     width: 140px;
   }
-  .task-form{
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .task-form input,
-  .task-form select,
-  .task-form button{
-    width: 100%;
+}
+
+@media (max-width: 1100px){
+  .layout{
+    grid-template-columns: 240px 1fr;
   }
 }
 
-/* Si la ventana es ultra estrecha, mejor scroll horizontal que romper el layout */
+@media (max-width: 950px){
+  .layout{
+    grid-template-columns: 220px 1fr;
+  }
+}
+
+/* Si el usuario hace la ventana MUY estrecha, mejor scroll horizontal que romper a columna */
 @media (max-width: 520px){
   .layout{ overflow-x: auto; }
 }
