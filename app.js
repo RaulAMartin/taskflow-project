@@ -9,6 +9,7 @@ const taskList = document.getElementById("taskList");
 
 const searchInput = document.getElementById("searchInput");
 const topSearchInput = document.getElementById("topSearchInput");
+const topSearchInputMobile = document.getElementById("topSearchInputMobile");
 
 const filterHigh = document.getElementById("filterHigh");
 const filterMid = document.getElementById("filterMid");
@@ -22,14 +23,16 @@ const pillStudy = document.getElementById("pillStudy");
 const pillWork = document.getElementById("pillWork");
 const pillPersonal = document.getElementById("pillPersonal");
 
-const newTaskBtn = document.getElementById("newTaskBtn");
-
+const categoryFilterButtons = document.querySelectorAll(".category-filter");
+const clearCategoryFiltersBtn = document.getElementById("clearCategoryFilters");
 
 const themeToggle = document.getElementById("themeToggle");
 
 const STORAGE_KEY = "taskflow_tasks_v4";
 const THEME_KEY = "taskflow_theme";
+
 let tasks = [];
+let selectedCategories = new Set();
 
 // ---------- Persistencia ----------
 function saveTasks() {
@@ -74,7 +77,7 @@ function seedIfEmpty() {
   saveTasks();
 }
 
-// ---------- Seguridad HTML  ----------
+// ---------- Seguridad HTML ----------
 function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
@@ -88,12 +91,17 @@ function escapeHtml(str) {
 function syncSearchInputs(v) {
   if (searchInput && searchInput.value !== v) searchInput.value = v;
   if (topSearchInput && topSearchInput.value !== v) topSearchInput.value = v;
+  if (topSearchInputMobile && topSearchInputMobile.value !== v) topSearchInputMobile.value = v;
 }
 
 function getSearchText() {
-  const a = topSearchInput ? topSearchInput.value : "";
-  const b = searchInput ? searchInput.value : "";
-  return a.length >= b.length ? a : b;
+  const values = [
+    searchInput?.value || "",
+    topSearchInput?.value || "",
+    topSearchInputMobile?.value || "",
+  ];
+
+  return values.sort((a, b) => b.length - a.length)[0] || "";
 }
 
 function getAllowedPriorities() {
@@ -106,12 +114,50 @@ function getAllowedPriorities() {
 
 function applyFilters(list) {
   const q = getSearchText().trim().toLowerCase();
-  const allowed = getAllowedPriorities();
+  const allowedPriorities = getAllowedPriorities();
 
   return list.filter((t) => {
     const matchesText = q === "" || t.text.toLowerCase().includes(q);
-    const matchesPriority = allowed.size === 0 ? false : allowed.has(t.priority);
-    return matchesText && matchesPriority;
+    const matchesPriority =
+      allowedPriorities.size === 0 ? false : allowedPriorities.has(t.priority);
+
+    const matchesCategory =
+      selectedCategories.size === 0 ? true : selectedCategories.has(t.category);
+
+    return matchesText && matchesPriority && matchesCategory;
+  });
+}
+
+function updateCategoryFilterUI() {
+  categoryFilterButtons.forEach((btn) => {
+    const category = btn.dataset.category;
+    const isActive = selectedCategories.has(category);
+
+    btn.setAttribute("aria-pressed", String(isActive));
+
+    btn.className = [
+      "category-filter",
+      "flex",
+      "w-full",
+      "items-center",
+      "justify-between",
+      "rounded-lg",
+      "border",
+      "px-3",
+      "py-2",
+      "text-left",
+      "transition",
+      isActive
+        ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+        : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900",
+    ].join(" ");
+
+    const badge = btn.querySelector("span:last-child");
+    if (badge) {
+      badge.className = isActive
+        ? "rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white dark:bg-slate-900/10 dark:text-slate-900"
+        : "rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100";
+    }
   });
 }
 
@@ -130,9 +176,8 @@ function updateStats() {
   pillPersonal.textContent = String(tasks.filter((t) => t.category === "Personal").length);
 }
 
-// ---------- Tailwind helpers (nuevos) ----------
+// ---------- Tailwind helpers ----------
 function badgeTailwind(priority) {
-  
   if (priority === "Alta") return "bg-red-500";
   if (priority === "Media") return "bg-amber-500";
   return "bg-emerald-500";
@@ -141,9 +186,7 @@ function badgeTailwind(priority) {
 function createTaskElement(task) {
   const card = document.createElement("article");
 
-
-  card.className =
-  [
+  card.className = [
     "task-card",
     "overflow-hidden",
     "rounded-xl border border-slate-200 bg-white p-4 shadow-sm",
@@ -158,9 +201,7 @@ function createTaskElement(task) {
   card.dataset.id = task.id;
 
   const titleClass = task.done ? "line-through decoration-2" : "";
-
   const badgeClass = badgeTailwind(task.priority);
-
 
   card.innerHTML = `
     <div class="grid gap-4 md:grid-cols-[1fr_220px]">
@@ -187,7 +228,7 @@ function createTaskElement(task) {
         </div>
       </div>
 
-      <!-- Panel derecho (acciones/meta) -->
+      <!-- Panel derecho -->
       <div class="min-w-0 flex flex-col gap-3">
         <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
                     dark:border-slate-800 dark:bg-slate-950">
@@ -242,6 +283,7 @@ function render() {
   filtered.forEach((t) => taskList.appendChild(createTaskElement(t)));
 
   updateStats();
+  updateCategoryFilterUI();
 }
 
 // ---------- CRUD ----------
@@ -259,7 +301,7 @@ function addTask(text, category, priority) {
   });
 
   saveTasks();
-  syncSearchInputs(""); 
+  syncSearchInputs("");
   taskInput.value = "";
   taskInput.focus();
   render();
@@ -275,14 +317,13 @@ function toggleDone(id) {
 }
 
 function deleteTask(id, cardEl) {
-
   if (cardEl) {
     cardEl.classList.add("opacity-0", "translate-y-1.5", "pointer-events-none");
     setTimeout(() => {
       tasks = tasks.filter((t) => t.id !== id);
       saveTasks();
       render();
-    }, 200); 
+    }, 200);
   } else {
     tasks = tasks.filter((t) => t.id !== id);
     saveTasks();
@@ -303,15 +344,12 @@ function initThemeToggle() {
     themeToggle.setAttribute("title", isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
   }
 
-  // 1) Cargar preferencia guardada
   const saved = localStorage.getItem(THEME_KEY);
   if (saved === "dark") root.classList.add("dark");
   if (saved === "light") root.classList.remove("dark");
 
-  // 2) Pintar icono inicial
   updateIcon();
 
-  // 3) Toggle
   themeToggle.addEventListener("click", () => {
     const isDark = root.classList.toggle("dark");
     localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
@@ -345,8 +383,16 @@ if (searchInput) {
     render();
   });
 }
+
 if (topSearchInput) {
   topSearchInput.addEventListener("input", (e) => {
+    syncSearchInputs(e.target.value);
+    render();
+  });
+}
+
+if (topSearchInputMobile) {
+  topSearchInputMobile.addEventListener("input", (e) => {
     syncSearchInputs(e.target.value);
     render();
   });
@@ -356,8 +402,24 @@ filterHigh?.addEventListener("change", render);
 filterMid?.addEventListener("change", render);
 filterLow?.addEventListener("change", render);
 
-newTaskBtn?.addEventListener("click", () => {
-  taskInput.focus();
+categoryFilterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const category = btn.dataset.category;
+    if (!category) return;
+
+    if (selectedCategories.has(category)) {
+      selectedCategories.delete(category);
+    } else {
+      selectedCategories.add(category);
+    }
+
+    render();
+  });
+});
+
+clearCategoryFiltersBtn?.addEventListener("click", () => {
+  selectedCategories.clear();
+  render();
 });
 
 // ---------- Inicio ----------
