@@ -78,9 +78,7 @@
   </header>
 
   <!-- WRAP -->
-  <main class="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 py-6 lg:grid-cols-12">
-    <!-- CONTENT -->
-    <section class="order-1 space-y-4 lg:order-2 lg:col-span-9">
+
       <header class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -90,9 +88,9 @@
             </p>
           </div>
 
-          <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+          <div class="flex flex-col gap-2 xl:flex-row xl:flex-wrap xl:items-center xl:justify-end">
             <!-- Filtro por estado -->
-            <div class="flex flex-wrap gap-2" aria-label="Filtro por estado">
+            <div class="flex flex-wrap gap-2 xl:justify-end" aria-label="Filtro por estado">
               <button
                 id="viewAll"
                 type="button"
@@ -220,123 +218,126 @@
       <section id="taskList" class="flex flex-col gap-3" aria-live="polite"></section>
     </section>
 
-    <!-- SIDEBAR -->
-    <aside class="order-2 space-y-4 lg:order-1 lg:col-span-3">
-      <!-- Resumen -->
-      <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Resumen</h2>
+<main class="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 py-6 lg:grid-cols-12 lg:items-start">
+  <!-- SIDEBAR -->
+  <aside class="order-1 space-y-4 lg:col-span-4 xl:col-span-3">
+    <!-- Resumen -->
+    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Resumen</h2>
 
-        <div class="mt-3 grid grid-cols-2 gap-3">
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
-            <div class="text-xl font-semibold" id="statTotal">0</div>
-            <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Totales</div>
-          </div>
-
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
-            <div class="text-xl font-semibold" id="statCompleted">0</div>
-            <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Completadas</div>
-          </div>
-
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
-            <div class="text-xl font-semibold" id="statPending">0</div>
-            <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Pendientes</div>
-          </div>
-
-          <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
-            <div class="text-xl font-semibold" id="statHigh">0</div>
-            <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Urgentes</div>
-          </div>
+      <div class="mt-3 grid grid-cols-2 gap-3">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+          <div class="text-xl font-semibold" id="statTotal">0</div>
+          <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Totales</div>
         </div>
-      </section>
 
-      <!-- Categorías -->
-      <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div class="flex items-center justify-between gap-2">
-          <h2 class="text-sm font-semibold">Categorías</h2>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+          <div class="text-xl font-semibold" id="statCompleted">0</div>
+          <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Completadas</div>
+        </div>
+
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+          <div class="text-xl font-semibold" id="statPending">0</div>
+          <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Pendientes</div>
+        </div>
+
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
+          <div class="text-xl font-semibold" id="statHigh">0</div>
+          <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">Urgentes</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categorías -->
+    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-sm font-semibold">Categorías</h2>
+        <button
+          id="clearCategoryFilters"
+          type="button"
+          class="text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition"
+        >
+          Limpiar
+        </button>
+      </div>
+
+      <ul class="mt-3 space-y-2">
+        <li>
           <button
-            id="clearCategoryFilters"
             type="button"
-            class="text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition"
+            data-category="Estudio"
+            aria-pressed="false"
+            class="category-filter flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900"
           >
-            Limpiar
+            <span class="flex items-center gap-2 text-sm">
+              <span class="h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
+              <span>Estudio</span>
+            </span>
+            <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillStudy">0</span>
           </button>
-        </div>
+        </li>
 
-        <ul class="mt-3 space-y-2">
-          <li>
-            <button
-              type="button"
-              data-category="Estudio"
-              aria-pressed="false"
-              class="category-filter flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900"
-            >
-              <span class="flex items-center gap-2 text-sm">
-                <span class="h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
-                <span>Estudio</span>
-              </span>
-              <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillStudy">0</span>
-            </button>
-          </li>
+        <li>
+          <button
+            type="button"
+            data-category="Trabajo"
+            aria-pressed="false"
+            class="category-filter flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900"
+          >
+            <span class="flex items-center gap-2 text-sm">
+              <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+              <span>Trabajo</span>
+            </span>
+            <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillWork">0</span>
+          </button>
+        </li>
 
-          <li>
-            <button
-              type="button"
-              data-category="Trabajo"
-              aria-pressed="false"
-              class="category-filter flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900"
-            >
-              <span class="flex items-center gap-2 text-sm">
-                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                <span>Trabajo</span>
-              </span>
-              <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillWork">0</span>
-            </button>
-          </li>
+        <li>
+          <button
+            type="button"
+            data-category="Personal"
+            aria-pressed="false"
+            class="category-filter flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900"
+          >
+            <span class="flex items-center gap-2 text-sm">
+              <span class="h-2.5 w-2.5 rounded-full bg-pink-500"></span>
+              <span>Personal</span>
+            </span>
+            <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillPersonal">0</span>
+          </button>
+        </li>
+      </ul>
 
-          <li>
-            <button
-              type="button"
-              data-category="Personal"
-              aria-pressed="false"
-              class="category-filter flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-left transition hover:border-slate-300 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700 dark:hover:bg-slate-900"
-            >
-              <span class="flex items-center gap-2 text-sm">
-                <span class="h-2.5 w-2.5 rounded-full bg-pink-500"></span>
-                <span>Personal</span>
-              </span>
-              <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100" id="pillPersonal">0</span>
-            </button>
-          </li>
-        </ul>
+      <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        Puedes seleccionar varias categorías a la vez.
+      </p>
+    </section>
 
-        <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
-          Puedes seleccionar varias categorías a la vez.
-        </p>
-      </section>
+    <!-- Filtros -->
+    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h2 class="text-sm font-semibold">Filtros de prioridad</h2>
 
-      <!-- Filtros -->
-      <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <h2 class="text-sm font-semibold">Filtros de prioridad</h2>
+      <div class="mt-3 space-y-2 text-sm">
+        <label class="flex items-center gap-2">
+          <input id="filterHigh" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
+          <span class="text-slate-700 dark:text-slate-300">Mostrar alta prioridad</span>
+        </label>
 
-        <div class="mt-3 space-y-2 text-sm">
-          <label class="flex items-center gap-2">
-            <input id="filterHigh" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
-            <span class="text-slate-700 dark:text-slate-300">Mostrar alta prioridad</span>
-          </label>
+        <label class="flex items-center gap-2">
+          <input id="filterMid" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
+          <span class="text-slate-700 dark:text-slate-300">Mostrar media prioridad</span>
+        </label>
 
-          <label class="flex items-center gap-2">
-            <input id="filterMid" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
-            <span class="text-slate-700 dark:text-slate-300">Mostrar media prioridad</span>
-          </label>
+        <label class="flex items-center gap-2">
+          <input id="filterLow" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
+          <span class="text-slate-700 dark:text-slate-300">Mostrar baja prioridad</span>
+        </label>
+      </div>
+    </section>
+  </aside>
 
-          <label class="flex items-center gap-2">
-            <input id="filterLow" type="checkbox" checked class="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-slate-600" />
-            <span class="text-slate-700 dark:text-slate-300">Mostrar baja prioridad</span>
-          </label>
-        </div>
-      </section>
-    </aside>
-  </main>
+  <!-- CONTENT -->
+  <section class="order-2 space-y-4 lg:col-span-8 xl:col-span-9">
 
   <script src="app.js"></script>
 </body>
