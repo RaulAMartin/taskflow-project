@@ -1,11 +1,12 @@
-// ===== Taskflow - App JS (Tailwind refactor + Dark mode toggle) =====
+// ===== Taskflow - App JS mejorado =====
 
-// Elementos base
+// ---------- Elementos base ----------
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
 const taskCategory = document.getElementById("taskCategory");
 const taskPriority = document.getElementById("taskPriority");
 const taskList = document.getElementById("taskList");
+const formMessage = document.getElementById("formMessage");
 
 const searchInput = document.getElementById("searchInput");
 const topSearchInput = document.getElementById("topSearchInput");
@@ -16,6 +17,7 @@ const filterMid = document.getElementById("filterMid");
 const filterLow = document.getElementById("filterLow");
 
 const statTotal = document.getElementById("statTotal");
+const statCompleted = document.getElementById("statCompleted");
 const statPending = document.getElementById("statPending");
 const statHigh = document.getElementById("statHigh");
 
@@ -26,24 +28,150 @@ const pillPersonal = document.getElementById("pillPersonal");
 const categoryFilterButtons = document.querySelectorAll(".category-filter");
 const clearCategoryFiltersBtn = document.getElementById("clearCategoryFilters");
 
+const viewAllBtn = document.getElementById("viewAll");
+const viewPendingBtn = document.getElementById("viewPending");
+const viewCompletedBtn = document.getElementById("viewCompleted");
+
+const markAllDoneBtn = document.getElementById("markAllDone");
+const clearCompletedBtn = document.getElementById("clearCompleted");
+const sortTasks = document.getElementById("sortTasks");
+
 const themeToggle = document.getElementById("themeToggle");
 
-const STORAGE_KEY = "taskflow_tasks_v4";
+// ---------- Config ----------
+const STORAGE_KEY = "taskflow_tasks_v5";
 const THEME_KEY = "taskflow_theme";
 
 let tasks = [];
 let selectedCategories = new Set();
+let currentView = "all"; // all | pending | completed
+let currentSort = "newest"; // newest | oldest | priority | alphabetical
+
+// ---------- Utilidades ----------
+/**
+ * Escapa HTML para evitar inyección.
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/**
+ * Normaliza espacios en un texto.
+ * @param {string} text
+ * @returns {string}
+ */
+function normalizeText(text) {
+  return String(text).trim().replace(/\s+/g, " ");
+}
+
+/**
+ * Convierte prioridad en valor numérico para ordenar.
+ * @param {string} priority
+ * @returns {number}
+ */
+function getPriorityValue(priority) {
+  if (priority === "Alta") return 0;
+  if (priority === "Media") return 1;
+  return 2;
+}
+
+/**
+ * Formatea una fecha en español.
+ * @param {number} timestamp
+ * @returns {string}
+ */
+function formatDate(timestamp) {
+  return new Date(timestamp).toLocaleString("es-ES", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
+
+/**
+ * Muestra un mensaje de formulario.
+ * @param {string} text
+ * @param {"error"|"success"|"info"} type
+ */
+function showFormMessage(text, type = "info") {
+  if (!formMessage) return;
+
+  formMessage.textContent = text;
+  formMessage.classList.remove("hidden");
+
+  const baseClasses = "mt-3 rounded-lg border px-3 py-2 text-sm";
+  let colorClasses = "";
+
+  if (type === "error") {
+    colorClasses =
+      "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200";
+  } else if (type === "success") {
+    colorClasses =
+      "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-200";
+  } else {
+    colorClasses =
+      "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200";
+  }
+
+  formMessage.className = `${baseClasses} ${colorClasses}`;
+}
+
+/** Oculta el mensaje del formulario. */
+function hideFormMessage() {
+  if (!formMessage) return;
+  formMessage.textContent = "";
+  formMessage.className = "mt-3 hidden rounded-lg border px-3 py-2 text-sm";
+}
+
+/**
+ * Valida el título de una tarea.
+ * @param {string} text
+ * @param {string|null} ignoreId
+ * @returns {string|null}
+ */
+function validateTaskText(text, ignoreId = null) {
+  const clean = normalizeText(text);
+
+  if (!clean) return "La tarea no puede estar vacía.";
+  if (clean.length < 3) return "La tarea debe tener al menos 3 caracteres.";
+  if (clean.length > 120) return "La tarea no puede superar los 120 caracteres.";
+
+  const duplicated = tasks.some(
+    (task) =>
+      task.id !== ignoreId &&
+      task.text.toLowerCase() === clean.toLowerCase()
+  );
+
+  if (duplicated) return "Ya existe una tarea con ese mismo texto.";
+
+  return null;
+}
 
 // ---------- Persistencia ----------
+/** Guarda las tareas en localStorage. */
 function saveTasks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
+/** Carga las tareas desde localStorage. */
 function loadTasks() {
   const data = localStorage.getItem(STORAGE_KEY);
-  tasks = data ? JSON.parse(data) : [];
+
+  try {
+    const parsed = data ? JSON.parse(data) : [];
+    tasks = Array.isArray(parsed) ? parsed : [];
+  } catch {
+    tasks = [];
+  }
 }
 
+/** Carga tareas de ejemplo solo si la lista está vacía. */
 function seedIfEmpty() {
   if (tasks.length > 0) return;
 
@@ -62,7 +190,7 @@ function seedIfEmpty() {
       category: "Trabajo",
       priority: "Baja",
       done: false,
-      createdAt: Date.now(),
+      createdAt: Date.now() - 1000 * 60 * 10,
     },
     {
       id: crypto.randomUUID(),
@@ -70,30 +198,27 @@ function seedIfEmpty() {
       category: "Personal",
       priority: "Media",
       done: false,
-      createdAt: Date.now(),
+      createdAt: Date.now() - 1000 * 60 * 20,
     },
   ];
 
   saveTasks();
 }
 
-// ---------- Seguridad HTML ----------
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+// ---------- Búsqueda y filtros ----------
+/**
+ * Sincroniza los tres inputs de búsqueda.
+ * @param {string} value
+ */
+function syncSearchInputs(value) {
+  if (searchInput && searchInput.value !== value) searchInput.value = value;
+  if (topSearchInput && topSearchInput.value !== value) topSearchInput.value = value;
+  if (topSearchInputMobile && topSearchInputMobile.value !== value) {
+    topSearchInputMobile.value = value;
+  }
 }
 
-// ---------- Filtros / búsqueda ----------
-function syncSearchInputs(v) {
-  if (searchInput && searchInput.value !== v) searchInput.value = v;
-  if (topSearchInput && topSearchInput.value !== v) topSearchInput.value = v;
-  if (topSearchInputMobile && topSearchInputMobile.value !== v) topSearchInputMobile.value = v;
-}
-
+/** Devuelve el texto de búsqueda más actualizado. */
 function getSearchText() {
   const values = [
     searchInput?.value || "",
@@ -104,30 +229,80 @@ function getSearchText() {
   return values.sort((a, b) => b.length - a.length)[0] || "";
 }
 
+/** Devuelve las prioridades marcadas. */
 function getAllowedPriorities() {
   const set = new Set();
+
   if (filterHigh?.checked) set.add("Alta");
   if (filterMid?.checked) set.add("Media");
   if (filterLow?.checked) set.add("Baja");
+
   return set;
 }
 
+/**
+ * Aplica filtros de texto, prioridad, categoría y estado.
+ * @param {Array} list
+ * @returns {Array}
+ */
 function applyFilters(list) {
   const q = getSearchText().trim().toLowerCase();
   const allowedPriorities = getAllowedPriorities();
 
-  return list.filter((t) => {
-    const matchesText = q === "" || t.text.toLowerCase().includes(q);
+  return list.filter((task) => {
+    const matchesText =
+      q === "" || task.text.toLowerCase().includes(q);
+
     const matchesPriority =
-      allowedPriorities.size === 0 ? false : allowedPriorities.has(t.priority);
+      allowedPriorities.size === 0 ? false : allowedPriorities.has(task.priority);
 
     const matchesCategory =
-      selectedCategories.size === 0 ? true : selectedCategories.has(t.category);
+      selectedCategories.size === 0 ? true : selectedCategories.has(task.category);
 
-    return matchesText && matchesPriority && matchesCategory;
+    const matchesView =
+      currentView === "all"
+        ? true
+        : currentView === "pending"
+        ? !task.done
+        : task.done;
+
+    return matchesText && matchesPriority && matchesCategory && matchesView;
   });
 }
 
+/**
+ * Ordena las tareas filtradas.
+ * @param {Array} list
+ * @returns {Array}
+ */
+function applySort(list) {
+  const sorted = [...list];
+
+  if (currentSort === "oldest") {
+    sorted.sort((a, b) => a.createdAt - b.createdAt);
+  }
+
+  if (currentSort === "newest") {
+    sorted.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  if (currentSort === "priority") {
+    sorted.sort((a, b) => {
+      const priorityDiff = getPriorityValue(a.priority) - getPriorityValue(b.priority);
+      if (priorityDiff !== 0) return priorityDiff;
+      return b.createdAt - a.createdAt;
+    });
+  }
+
+  if (currentSort === "alphabetical") {
+    sorted.sort((a, b) => a.text.localeCompare(b.text, "es"));
+  }
+
+  return sorted;
+}
+
+// ---------- UI ----------
+/** Actualiza la apariencia de los filtros de categoría. */
 function updateCategoryFilterUI() {
   categoryFilterButtons.forEach((btn) => {
     const category = btn.dataset.category;
@@ -153,6 +328,7 @@ function updateCategoryFilterUI() {
     ].join(" ");
 
     const badge = btn.querySelector("span:last-child");
+
     if (badge) {
       badge.className = isActive
         ? "rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white dark:bg-slate-900/10 dark:text-slate-900"
@@ -161,38 +337,76 @@ function updateCategoryFilterUI() {
   });
 }
 
-// ---------- Stats ----------
+/** Actualiza la apariencia de los botones de vista. */
+function updateViewButtonsUI() {
+  const map = [
+    { btn: viewAllBtn, view: "all" },
+    { btn: viewPendingBtn, view: "pending" },
+    { btn: viewCompletedBtn, view: "completed" },
+  ];
+
+  map.forEach(({ btn, view }) => {
+    if (!btn) return;
+
+    const isActive = currentView === view;
+
+    btn.className = isActive
+      ? "rounded-lg border border-slate-200 bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 dark:border-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+      : "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800";
+  });
+}
+
+/** Actualiza estadísticas generales. */
 function updateStats() {
   const total = tasks.length;
-  const pending = tasks.filter((t) => !t.done).length;
-  const urgent = tasks.filter((t) => t.priority === "Alta").length;
+  const completed = tasks.filter((task) => task.done).length;
+  const pending = tasks.filter((task) => !task.done).length;
+  const urgent = tasks.filter((task) => task.priority === "Alta").length;
 
   statTotal.textContent = String(total);
+  statCompleted.textContent = String(completed);
   statPending.textContent = String(pending);
   statHigh.textContent = String(urgent);
 
-  pillStudy.textContent = String(tasks.filter((t) => t.category === "Estudio").length);
-  pillWork.textContent = String(tasks.filter((t) => t.category === "Trabajo").length);
-  pillPersonal.textContent = String(tasks.filter((t) => t.category === "Personal").length);
+  pillStudy.textContent = String(tasks.filter((task) => task.category === "Estudio").length);
+  pillWork.textContent = String(tasks.filter((task) => task.category === "Trabajo").length);
+  pillPersonal.textContent = String(tasks.filter((task) => task.category === "Personal").length);
 }
 
-// ---------- Tailwind helpers ----------
+/**
+ * Devuelve clases visuales según la prioridad.
+ * @param {string} priority
+ * @returns {string}
+ */
 function badgeTailwind(priority) {
   if (priority === "Alta") return "bg-red-500";
   if (priority === "Media") return "bg-amber-500";
   return "bg-emerald-500";
 }
 
+/**
+ * Crea un elemento visual de tarea.
+ * @param {object} task
+ * @returns {HTMLElement}
+ */
 function createTaskElement(task) {
   const card = document.createElement("article");
 
   card.className = [
     "task-card",
     "overflow-hidden",
-    "rounded-xl border border-slate-200 bg-white p-4 shadow-sm",
-    "transition duration-200",
-    "hover:-translate-y-0.5 hover:shadow-md",
-    "dark:border-slate-800 dark:bg-slate-900",
+    "rounded-xl",
+    "border",
+    "border-slate-200",
+    "bg-white",
+    "p-4",
+    "shadow-sm",
+    "transition",
+    "duration-200",
+    "hover:-translate-y-0.5",
+    "hover:shadow-md",
+    "dark:border-slate-800",
+    "dark:bg-slate-900",
     task.done ? "opacity-80" : "",
   ]
     .filter(Boolean)
@@ -204,41 +418,43 @@ function createTaskElement(task) {
   const badgeClass = badgeTailwind(task.priority);
 
   card.innerHTML = `
-    <div class="grid gap-4 md:grid-cols-[1fr_220px]">
-      <!-- Columna principal -->
+    <div class="grid gap-4 lg:grid-cols-[1fr_220px]">
       <div class="min-w-0">
-        <div class="text-sm font-extrabold ${titleClass}">
-          ${escapeHtml(task.text)}
+        <div class="flex flex-wrap items-start justify-between gap-2">
+          <h3 class="text-sm font-extrabold ${titleClass}">
+            ${escapeHtml(task.text)}
+          </h3>
+
+          <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold ${
+            task.done
+              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
+              : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+          }">
+            ${task.done ? "Completada" : "Pendiente"}
+          </span>
         </div>
 
-        <div class="mt-1 text-xs text-slate-600 dark:text-slate-400">
-          ${escapeHtml(task.category)}
+        <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          Creada: ${escapeHtml(formatDate(task.createdAt))}
         </div>
 
         <div class="mt-3 flex flex-wrap gap-2">
-          <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700
-                       dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+          <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
             ${escapeHtml(task.category)}
           </span>
 
-          <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700
-                       dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+          <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
             ${escapeHtml(task.priority)}
           </span>
         </div>
       </div>
 
-      <!-- Panel derecho -->
       <div class="min-w-0 flex flex-col gap-3">
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
-                    dark:border-slate-800 dark:bg-slate-950">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
           <div class="mb-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">Estado</div>
 
           <button
-            class="w-full rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-800
-                   hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400
-                   dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-slate-600
-                   transition"
+            class="w-full rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-800 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-slate-600 transition"
             data-action="toggle"
             type="button"
           >
@@ -246,28 +462,33 @@ function createTaskElement(task) {
           </button>
         </div>
 
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
-                    dark:border-slate-800 dark:bg-slate-950">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
           <div class="mb-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">Prioridad</div>
           <span class="inline-flex w-full items-center justify-center rounded-full px-3 py-2 text-xs font-extrabold text-white ${badgeClass}">
             ${escapeHtml(task.priority)}
           </span>
         </div>
 
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center
-                    dark:border-slate-800 dark:bg-slate-950">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center dark:border-slate-800 dark:bg-slate-950">
           <div class="mb-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400">Acciones</div>
 
-          <button
-            class="w-full rounded-full bg-red-500/15 px-3 py-2 text-xs font-extrabold text-red-700
-                   hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400
-                   dark:text-red-200 dark:focus:ring-red-500
-                   transition"
-            data-action="delete"
-            type="button"
-          >
-            Eliminar
-          </button>
+          <div class="flex gap-2">
+            <button
+              class="w-full rounded-full bg-slate-900 px-3 py-2 text-xs font-extrabold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:focus:ring-slate-600 transition"
+              data-action="edit"
+              type="button"
+            >
+              Editar
+            </button>
+
+            <button
+              class="w-full rounded-full bg-red-500/15 px-3 py-2 text-xs font-extrabold text-red-700 hover:bg-red-500/20 focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-200 dark:focus:ring-red-500 transition"
+              data-action="delete"
+              type="button"
+            >
+              Eliminar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -276,20 +497,52 @@ function createTaskElement(task) {
   return card;
 }
 
+/** Muestra un estado vacío si no hay tareas visibles. */
+function renderEmptyState() {
+  taskList.innerHTML = `
+    <article class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div class="text-base font-semibold">No hay tareas que mostrar</div>
+      <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+        Prueba a cambiar los filtros o añade una nueva tarea.
+      </p>
+    </article>
+  `;
+}
+
+/** Renderiza toda la interfaz. */
 function render() {
   taskList.innerHTML = "";
 
   const filtered = applyFilters(tasks);
-  filtered.forEach((t) => taskList.appendChild(createTaskElement(t)));
+  const sorted = applySort(filtered);
+
+  if (sorted.length === 0) {
+    renderEmptyState();
+  } else {
+    sorted.forEach((task) => taskList.appendChild(createTaskElement(task)));
+  }
 
   updateStats();
   updateCategoryFilterUI();
+  updateViewButtonsUI();
 }
 
 // ---------- CRUD ----------
+/**
+ * Añade una nueva tarea.
+ * @param {string} text
+ * @param {string} category
+ * @param {string} priority
+ */
 function addTask(text, category, priority) {
-  const clean = text.trim();
-  if (!clean) return;
+  const clean = normalizeText(text);
+  const error = validateTaskText(clean);
+
+  if (error) {
+    showFormMessage(error, "error");
+    taskInput.focus();
+    return;
+  }
 
   tasks.unshift({
     id: crypto.randomUUID(),
@@ -301,37 +554,105 @@ function addTask(text, category, priority) {
   });
 
   saveTasks();
-  syncSearchInputs("");
   taskInput.value = "";
+  hideFormMessage();
+  showFormMessage("Tarea añadida correctamente.", "success");
   taskInput.focus();
   render();
 }
 
+/**
+ * Cambia el estado completado de una tarea.
+ * @param {string} id
+ */
 function toggleDone(id) {
-  const t = tasks.find((x) => x.id === id);
-  if (!t) return;
+  const task = tasks.find((item) => item.id === id);
+  if (!task) return;
 
-  t.done = !t.done;
+  task.done = !task.done;
   saveTasks();
   render();
 }
 
-function deleteTask(id, cardEl) {
+/**
+ * Edita el texto de una tarea.
+ * @param {string} id
+ */
+function editTask(id) {
+  const task = tasks.find((item) => item.id === id);
+  if (!task) return;
+
+  const newText = window.prompt("Edita el texto de la tarea:", task.text);
+  if (newText === null) return;
+
+  const clean = normalizeText(newText);
+  const error = validateTaskText(clean, id);
+
+  if (error) {
+    showFormMessage(error, "error");
+    return;
+  }
+
+  task.text = clean;
+  saveTasks();
+  showFormMessage("Tarea editada correctamente.", "success");
+  render();
+}
+
+/**
+ * Elimina una tarea.
+ * @param {string} id
+ * @param {HTMLElement|null} cardEl
+ */
+function deleteTask(id, cardEl = null) {
   if (cardEl) {
     cardEl.classList.add("opacity-0", "translate-y-1.5", "pointer-events-none");
+
     setTimeout(() => {
-      tasks = tasks.filter((t) => t.id !== id);
+      tasks = tasks.filter((task) => task.id !== id);
       saveTasks();
       render();
     }, 200);
-  } else {
-    tasks = tasks.filter((t) => t.id !== id);
-    saveTasks();
-    render();
+
+    return;
   }
+
+  tasks = tasks.filter((task) => task.id !== id);
+  saveTasks();
+  render();
 }
 
-// ---------- Modo oscuro ----------
+/** Marca todas las tareas como completadas. */
+function markAllAsDone() {
+  const hasPending = tasks.some((task) => !task.done);
+
+  if (!hasPending) {
+    showFormMessage("Todas las tareas ya están completadas.", "info");
+    return;
+  }
+
+  tasks = tasks.map((task) => ({ ...task, done: true }));
+  saveTasks();
+  showFormMessage("Todas las tareas han sido completadas.", "success");
+  render();
+}
+
+/** Borra todas las tareas completadas. */
+function clearCompletedTasks() {
+  const completedCount = tasks.filter((task) => task.done).length;
+
+  if (completedCount === 0) {
+    showFormMessage("No hay tareas completadas para borrar.", "info");
+    return;
+  }
+
+  tasks = tasks.filter((task) => !task.done);
+  saveTasks();
+  showFormMessage("Tareas completadas eliminadas.", "success");
+  render();
+}
+
+// ---------- Tema ----------
 function initThemeToggle() {
   if (!themeToggle) return;
 
@@ -340,8 +661,14 @@ function initThemeToggle() {
   function updateIcon() {
     const isDark = root.classList.contains("dark");
     themeToggle.textContent = isDark ? "☀️" : "🌙";
-    themeToggle.setAttribute("aria-label", isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
-    themeToggle.setAttribute("title", isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+    themeToggle.setAttribute(
+      "aria-label",
+      isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
+    );
+    themeToggle.setAttribute(
+      "title",
+      isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"
+    );
   }
 
   const saved = localStorage.getItem(THEME_KEY);
@@ -358,42 +685,43 @@ function initThemeToggle() {
 }
 
 // ---------- Eventos ----------
-taskForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+taskForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
   addTask(taskInput.value, taskCategory.value, taskPriority.value);
 });
 
-taskList.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-action]");
+taskList?.addEventListener("click", (event) => {
+  const btn = event.target.closest("button[data-action]");
   if (!btn) return;
 
-  const card = e.target.closest(".task-card");
+  const card = event.target.closest(".task-card");
   if (!card) return;
 
   const id = card.dataset.id;
   const action = btn.dataset.action;
 
   if (action === "toggle") toggleDone(id);
+  if (action === "edit") editTask(id);
   if (action === "delete") deleteTask(id, card);
 });
 
 if (searchInput) {
-  searchInput.addEventListener("input", (e) => {
-    syncSearchInputs(e.target.value);
+  searchInput.addEventListener("input", (event) => {
+    syncSearchInputs(event.target.value);
     render();
   });
 }
 
 if (topSearchInput) {
-  topSearchInput.addEventListener("input", (e) => {
-    syncSearchInputs(e.target.value);
+  topSearchInput.addEventListener("input", (event) => {
+    syncSearchInputs(event.target.value);
     render();
   });
 }
 
 if (topSearchInputMobile) {
-  topSearchInputMobile.addEventListener("input", (e) => {
-    syncSearchInputs(e.target.value);
+  topSearchInputMobile.addEventListener("input", (event) => {
+    syncSearchInputs(event.target.value);
     render();
   });
 }
@@ -421,6 +749,29 @@ clearCategoryFiltersBtn?.addEventListener("click", () => {
   selectedCategories.clear();
   render();
 });
+
+viewAllBtn?.addEventListener("click", () => {
+  currentView = "all";
+  render();
+});
+
+viewPendingBtn?.addEventListener("click", () => {
+  currentView = "pending";
+  render();
+});
+
+viewCompletedBtn?.addEventListener("click", () => {
+  currentView = "completed";
+  render();
+});
+
+sortTasks?.addEventListener("change", (event) => {
+  currentSort = event.target.value;
+  render();
+});
+
+markAllDoneBtn?.addEventListener("click", markAllAsDone);
+clearCompletedBtn?.addEventListener("click", clearCompletedTasks);
 
 // ---------- Inicio ----------
 loadTasks();
