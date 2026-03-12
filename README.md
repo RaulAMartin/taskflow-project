@@ -1,126 +1,240 @@
-# Taskflow Project
-Proyecto inicial
+# TaskFlow
 
-Aplicación web (HTML + CSS + JavaScript) para gestionar tareas con persistencia en LocalStorage.
+TaskFlow es una aplicación web sencilla para gestionar tareas. Permite crear, completar, eliminar y filtrar tareas directamente desde el navegador, guardando la información en LocalStorage.
 
-## 🚀 Demo
+El objetivo de este proyecto es practicar desarrollo frontend completo utilizando HTML, JavaScript, Tailwind CSS y despliegue en la nube.
+
+---
+
+# Demo
+
 https://taskflow-project-orcin.vercel.app/
 
-## ✨ Funcionalidades
-- Añadir tareas con texto
+---
+
+# Funcionalidades
+
+La aplicación permite:
+
+- Crear nuevas tareas
+- Marcar tareas como completadas
 - Eliminar tareas
-- Persistencia de datos con LocalStorage
-- Filtro de búsqueda por texto
-- Diseño responsive
-- Sistema de diseño con Tailwind CSS
-- Modo oscuro con selector de tema
+- Filtrar tareas por texto
+- Filtrar por prioridad
+- Filtrar por categoría
+- Ver estadísticas de tareas
+- Marcar todas las tareas como completadas
+- Eliminar todas las tareas completadas
+- Ordenar tareas
+- Cambiar entre modo claro y modo oscuro
+- Guardar automáticamente las tareas en LocalStorage
 
-## 🧰 Tecnologías
+---
+
+# Tecnologías utilizadas
+
 - HTML semántico
-- CSS (variables `:root`, Flexbox, Media Queries, Transiciones)
-- JavaScript (DOM, eventos, LocalStorage)
+- CSS moderno
 - Tailwind CSS
+- JavaScript
+- LocalStorage
+- Git
+- GitHub
+- Vercel
 
 ---
 
-# 📚 Desarrollo del proyecto
+# Estructura del proyecto
 
-## 1️⃣ Estructura y diseño con HTML y CSS
+taskflow-project
+│
+├── docs
+│ └── ai
+│ ├── ai-comparison.md
+│ ├── cursor-workflow.md
+│ ├── prompt-engineering.md
+│ ├── experiments.md
+│ └── reflection.md
+│
+├── dist
+│ └── output.css
+│
+├── index.html
+├── app.js
+├── style.css
+├── tailwind.config.js
+├── postcss.config.js
+├── package.json
+├── package-lock.json
+└── README.md
 
-Creación de la estructura visual inicial de la aplicación y despliegue en internet.
+# Cómo usar la aplicación
 
-### Implementaciones realizadas
+1. Escribe una tarea en el campo de texto.
+2. Pulsa el botón **Añadir** o presiona Enter.
+3. Usa el buscador para encontrar tareas.
+4. Usa los filtros para mostrar tareas específicas.
+5. Marca tareas como completadas o elimínalas.
+6. Cambia entre modo claro y oscuro.
 
-- Creación del archivo `index.html` utilizando etiquetas semánticas:
-  - `<header>`
-  - `<main>`
-  - `<aside>`
-  - `<section>`
-
-- Definición de variables CSS en `:root` para gestionar:
-  - Colores
-  - Fuentes
-  - Espaciados
-
-- Maquetación de la lista de tareas utilizando **Flexbox** (`display: flex`) para alinear:
-  - Título de tarea
-  - Categoría
-  - Badge de prioridad
-
-- Implementación de **Media Queries** para asegurar que la barra lateral se adapte correctamente en dispositivos móviles.
-
-- Publicación del proyecto conectando el repositorio de **Git** con **Vercel** para obtener una URL pública.
-
-### Bonus implementado
-- Transición suave en las tarjetas de tareas utilizando la propiedad `transition`.
-
----
-
-## 2️⃣ Interactividad con JavaScript y el DOM
-
-Transformación de la página estática en una aplicación dinámica utilizando JavaScript.
-
-### Implementaciones realizadas
-
-- Creación del archivo `app.js`.
-- Conexión del formulario de entrada de tareas mediante `addEventListener`.
-- Implementación de la función **añadir tarea**:
-  - Captura el texto del input
-  - Crea un nuevo elemento en la lista
-  - Limpia el campo de entrada.
-
-- Implementación de botón **Eliminar** en cada tarea:
-  - Elimina el nodo correspondiente del DOM.
-
-- Persistencia de datos usando **LocalStorage**:
-  - Guardado del array de tareas con `JSON.stringify`.
-  - Actualización automática cuando hay cambios.
-
-- Carga automática de tareas guardadas al iniciar la aplicación.
-
-### Bonus implementado
-- Filtro de búsqueda que oculta las tareas que no coinciden con el texto introducido.
+Las tareas se guardan automáticamente en el navegador.
 
 ---
 
-## 3️⃣ Sistema de diseño con Tailwind CSS
+# Responsive
 
-Optimización del diseño mediante un sistema de utilidades CSS y soporte para temas.
+La aplicación funciona correctamente en:
 
-### Implementaciones realizadas
+- móviles
+- tablets
+- escritorio
 
-- Instalación y configuración de **Tailwind CSS** en el proyecto.
-- Configuración del archivo `tailwind.config.js`.
-- Sustitución del CSS personalizado por **clases de utilidad de Tailwind**.
-- Implementación de **modo oscuro** utilizando el prefijo `dark:`.
+En escritorio se muestra un layout de dos columnas:
 
-- Creación de un botón que alterna el modo oscuro:
-  - Añadiendo o eliminando la clase `dark` en el elemento raíz.
 
-- Uso de la escala de espaciado y colores por defecto de Tailwind para mantener coherencia visual.
+Sidebar (estadísticas, filtros)
+Contenido principal (tareas)
 
-### Bonus implementado
-- Estados `hover` y `focus` en botones e inputs con transiciones personalizadas.
+
+En móvil todo se reorganiza en una sola columna.
 
 ---
 
-## 📝 Uso
+# Inteligencia Artificial aplicada
 
-1. Escribe una tarea en el campo de entrada.
-2. Pulsa **Añadir** o presiona **Enter**.
-3. Usa el buscador para filtrar tareas.
-4. Elimina tareas usando el botón **Eliminar**.
-5. Cambia entre **modo claro y modo oscuro** con el selector de tema.
+Durante el desarrollo se utilizaron herramientas de IA para:
+
+- analizar código
+- refactorizar funciones
+- detectar errores
+- mejorar la estructura del proyecto
+- generar documentación
+
+Toda la documentación se encuentra en:
+
+
+docs/ai
+
+
+Incluye:
+
+- comparación de asistentes de IA
+- workflow con Cursor
+- prompt engineering
+- experimentos
+- reflexión final
 
 ---
 
-## 🎯 Objetivo del proyecto
+# Instalación local
 
-El objetivo de estas tareas es verificar que se poseen los conocimientos técnicos necesarios para comenzar a trabajar en proyectos web completos, así como reforzar progresivamente habilidades en:
+Si quieres ejecutar el proyecto localmente:
 
-- HTML semántico
-- CSS moderno y responsive
-- Manipulación del DOM con JavaScript
-- Persistencia de datos en el navegador
-- Uso de frameworks CSS modernos como Tailwind
-- Despliegue de aplicaciones web
+```bash
+git clone https://github.com/tu-usuario/taskflow-project.git
+cd taskflow-project
+npm install
+
+Para compilar Tailwind:
+
+npx tailwindcss -i ./style.css -o ./dist/output.css --watch
+
+Después abre index.html con Live Server.
+
+Testing manual
+
+Se realizaron pruebas manuales para comprobar:
+
+añadir tareas
+
+eliminar tareas
+
+completar tareas
+
+persistencia en LocalStorage
+
+funcionamiento responsive
+
+cambio de tema
+
+filtros
+
+Los resultados son correctos.
+
+Despliegue
+
+El proyecto está desplegado en Vercel.
+
+Cada push al repositorio genera automáticamente un nuevo despliegue.
+
+Autor
+
+Proyecto desarrollado por Raul Martin como parte del bootcamp de desarrollo web.
+
+
+---
+
+# 3. Estructura final recomendada
+
+Tu repo debería quedar así:
+
+
+taskflow-project
+│
+├── docs
+│ └── ai
+│ ├── ai-comparison.md
+│ ├── cursor-workflow.md
+│ ├── prompt-engineering.md
+│ ├── experiments.md
+│ └── reflection.md
+│
+├── dist
+│ └── output.css
+│
+├── index.html
+├── app.js
+├── style.css
+├── tailwind.config.js
+├── postcss.config.js
+├── package.json
+├── package-lock.json
+├── .gitignore
+└── README.md
+
+
+Y **sin `node_modules` en GitHub**.
+
+---
+
+# 4. Subir todo a GitHub
+
+Ejecuta:
+
+```bash
+git add .
+git commit -m "Finalize project documentation and cleanup repository"
+git push
+5. Resultado final
+
+Tu proyecto ahora cumple:
+
+Semana 1
+
+✔ HTML semántico
+✔ Responsive
+✔ Tailwind
+✔ LocalStorage
+✔ CRUD tareas
+✔ Filtros
+✔ Dark mode
+✔ Deploy en Vercel
+
+Semana 2
+
+✔ docs/ai completos
+✔ comparativa IA
+✔ prompt engineering
+✔ experiments
+✔ reflection
+✔ README documentado

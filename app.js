@@ -44,8 +44,9 @@ const THEME_KEY = "taskflow_theme";
 
 let tasks = [];
 let selectedCategories = new Set();
-let currentView = "all"; // all | pending | completed
-let currentSort = "newest"; // newest | oldest | priority | alphabetical
+let currentView = "all";
+let currentSort = "newest";
+let draggedTaskId = null;
 
 // ---------- Utilidades ----------
 /**
@@ -392,27 +393,29 @@ function badgeTailwind(priority) {
 function createTaskElement(task) {
   const card = document.createElement("article");
 
-  card.className = [
-    "task-card",
-    "overflow-hidden",
-    "rounded-xl",
-    "border",
-    "border-slate-200",
-    "bg-white",
-    "p-4",
-    "shadow-sm",
-    "transition",
-    "duration-200",
-    "hover:-translate-y-0.5",
-    "hover:shadow-md",
-    "dark:border-slate-800",
-    "dark:bg-slate-900",
-    task.done ? "opacity-80" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+card.className = [
+  "task-card",
+  "overflow-hidden",
+  "rounded-xl",
+  "border",
+  "border-slate-200",
+  "bg-white",
+  "p-4",
+  "shadow-sm",
+  "transition",
+  "duration-300",
+  "hover:-translate-y-0.5",
+  "hover:shadow-md",
+  "dark:border-slate-800",
+  "dark:bg-slate-900",
+  "opacity-0",
+  "translate-y-2",
+  task.done ? "opacity-80" : "",
+]
+  .filter(Boolean)
+  .join(" ");
 
-  card.dataset.id = task.id;
+  card.draggable = true;
 
   const titleClass = task.done ? "line-through decoration-2" : "";
   const badgeClass = badgeTailwind(task.priority);
@@ -497,6 +500,12 @@ function createTaskElement(task) {
   return card;
 }
 
+function animateTaskEntry(element) {
+  requestAnimationFrame(() => {
+    element.classList.remove("opacity-0", "translate-y-2");
+  });
+}
+
 /** Muestra un estado vacío si no hay tareas visibles. */
 function renderEmptyState() {
   taskList.innerHTML = `
@@ -519,8 +528,11 @@ function render() {
   if (sorted.length === 0) {
     renderEmptyState();
   } else {
-    sorted.forEach((task) => taskList.appendChild(createTaskElement(task)));
-  }
+    sorted.forEach((task) => {
+  const taskElement = createTaskElement(task);
+  taskList.appendChild(taskElement);
+  animateTaskEntry(taskElement);
+});
 
   updateStats();
   updateCategoryFilterUI();
@@ -652,6 +664,47 @@ function clearCompletedTasks() {
   render();
 }
 
+function moveTask(draggedId, targetId) {
+  if (draggedId === targetId) return;
+
+  const draggedIndex = tasks.findIndex((task) => task.id === draggedId);
+  const targetIndex = tasks.findIndex((task) => task.id === targetId);
+
+  if (draggedIndex === -1 || targetIndex === -1) return;
+
+  const [draggedTask] = tasks.splice(draggedIndex, 1);
+  tasks.splice(targetIndex, 0, draggedTask);
+
+  saveTasks();
+  render();
+}
+
+function initDragAndDrop() {
+  const taskCards = document.querySelectorAll(".task-card");
+
+  taskCards.forEach((card) => {
+    card.addEventListener("dragstart", () => {
+      draggedTaskId = card.dataset.id;
+      card.classList.add("opacity-50");
+    });
+
+    card.addEventListener("dragend", () => {
+      draggedTaskId = null;
+      card.classList.remove("opacity-50");
+    });
+
+    card.addEventListener("dragover", (event) => {
+      event.preventDefault();
+    });
+
+    card.addEventListener("drop", () => {
+      const targetId = card.dataset.id;
+      if (!draggedTaskId || !targetId) return;
+      moveTask(draggedTaskId, targetId);
+    });
+  });
+}
+
 // ---------- Tema ----------
 function initThemeToggle() {
   if (!themeToggle) return;
@@ -778,3 +831,4 @@ loadTasks();
 seedIfEmpty();
 initThemeToggle();
 render();
+}
