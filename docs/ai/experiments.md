@@ -1,122 +1,217 @@
-
----
-
-## 4. `docs/ai/experiments.md`
-
-```md
 # Experimentos con IA en programación
 
-En este documento recojo varios experimentos realizados para comparar cómo cambia mi trabajo al resolver problemas sin ayuda de IA y después con apoyo de herramientas de inteligencia artificial.
+En este documento se recogen varios experimentos realizados durante el desarrollo del proyecto **TaskFlow** para comparar cómo cambia el proceso de trabajo al resolver problemas **sin ayuda de inteligencia artificial** y posteriormente **con apoyo de herramientas de IA**.
 
-## Objetivo del documento
+El objetivo de estos experimentos es analizar de forma práctica cómo influye la IA en el proceso de desarrollo.
 
-El objetivo es analizar diferencias en:
+---
 
-- tiempo invertido
-- calidad del código
+# Objetivo del documento
+
+Los experimentos se centraron en analizar cuatro aspectos principales:
+
+- tiempo invertido en resolver el problema
+- calidad del código obtenido
 - comprensión del problema
-- utilidad real de la IA dentro del proceso
+- utilidad real de la IA dentro del proceso de desarrollo
 
-## Experimento 1: contar vocales
-
-### Sin IA
-Primero resolví el problema manualmente pensando una función que recorriera el texto y contara vocales. Tardé más porque tuve que revisar la lógica y asegurarme de cubrir mayúsculas y minúsculas.
-
-### Con IA
-Después pedí a la IA una función para contar vocales en JavaScript. Obtuve una solución válida rápidamente y pude compararla con la mía.
-
-### Comparación
-- Tiempo: con IA fue más rápido
-- Calidad: ambas soluciones eran correctas
-- Comprensión: al hacerlo primero sin IA entendí mejor el problema
+Para ello, cada problema se resolvió primero **sin utilizar IA**, y posteriormente se repitió con ayuda de herramientas como **ChatGPT o Cursor**.
 
 ---
 
-## Experimento 2: comprobar palíndromos
+# Experimentos con problemas generales de programación
 
-### Sin IA
-Resolví el problema usando `split`, `reverse` y `join`. Tardé poco porque es un problema conocido.
+## Experimento 1: contar vocales en un texto
 
-### Con IA
-La IA propuso una solución muy parecida a la mía.
+### Solución sin IA
 
-### Comparación
-- Tiempo: diferencia pequeña
-- Calidad: similar
-- Comprensión: no hubo gran diferencia
+Primero resolví el problema manualmente escribiendo una función que recorriera cada carácter del texto y comprobara si era una vocal.
 
----
+Esto requirió pensar la lógica para cubrir tanto **mayúsculas como minúsculas**.
 
-## Experimento 3: filtrar elementos de un array
+Ejemplo de solución:
 
-### Sin IA
-Escribí una función manual usando un bucle.
+```javascript
+function contarVocales(texto) {
+  const vocales = "aeiouAEIOU";
+  let contador = 0;
 
-### Con IA
-La IA me sugirió `filter()`, que era una solución más limpia y moderna.
+  for (let letra of texto) {
+    if (vocales.includes(letra)) {
+      contador++;
+    }
+  }
 
-### Comparación
-- Tiempo: con IA fue más rápido
-- Calidad: mejoró la legibilidad
-- Comprensión: me ayudó a recordar un método más adecuado
+  return contador;
+}
+Solución con IA
 
----
+Posteriormente pedí a la IA una función equivalente en JavaScript.
+La solución propuesta fue muy similar y también utilizaba un bucle y una lista de vocales.
 
-## Experimento 4: filtro de tareas en TaskFlow
+Comparación
+Aspecto	Sin IA	Con IA
+Tiempo	Mayor	Muy rápido
+Calidad	Correcta	Correcta
+Comprensión	Alta	Media
 
-### Sin IA
-Pensé manualmente cómo filtrar tareas por texto, prioridad y categoría. Me costó organizar bien la lógica.
+La principal diferencia fue el tiempo de obtención de la solución, aunque resolver el problema manualmente ayudó a comprender mejor la lógica.
 
-### Con IA
-La IA me ayudó a agrupar la lógica de filtros en funciones separadas y más reutilizables.
+Experimento 2: comprobar si una palabra es palíndroma
+Solución sin IA
 
-### Comparación
-- Tiempo: con IA se aceleró el proceso
-- Calidad: mejor estructura final
-- Comprensión: al revisar el resultado entendí mejor cómo dividir responsabilidades
+En este caso resolví el problema utilizando los métodos de JavaScript split(), reverse() y join().
 
----
+function esPalindromo(texto) {
+  const normalizado = texto.toLowerCase();
+  return normalizado === normalizado.split("").reverse().join("");
+}
+Solución con IA
 
-## Experimento 5: responsive layout del proyecto
+La IA generó prácticamente la misma solución, utilizando exactamente los mismos métodos.
 
-### Sin IA
-Intenté resolver el layout cambiando clases y probando distintas combinaciones de grid. Tardé bastante porque el problema real estaba en la estructura HTML.
+Comparación
+Aspecto	Sin IA	Con IA
+Tiempo	Bajo	Muy bajo
+Calidad	Correcta	Correcta
+Comprensión	Alta	Alta
 
-### Con IA
-La IA detectó que el HTML estaba mal estructurado y propuso una versión mejor organizada. Finalmente se resolvió usando una estructura más robusta.
+En problemas conocidos o simples, la diferencia entre trabajar con o sin IA es pequeña.
 
-### Comparación
-- Tiempo: la IA redujo mucho el tiempo de búsqueda del error
-- Calidad: mejoró el layout final
-- Comprensión: me ayudó a entender que no siempre falla Tailwind; a veces falla la estructura del HTML
+Experimento 3: filtrar elementos de un array
+Solución sin IA
 
----
+Inicialmente escribí una función utilizando un bucle for.
 
-## Experimento 6: mejoras del formulario
+function filtrarCompletadas(tareas) {
+  const resultado = [];
 
-### Sin IA
-Hice validaciones básicas a mano, pero no había pensado en duplicados o límites de longitud.
+  for (let tarea of tareas) {
+    if (tarea.completada) {
+      resultado.push(tarea);
+    }
+  }
 
-### Con IA
-La IA me sugirió añadir validaciones más completas y mensajes para el usuario.
+  return resultado;
+}
+Solución con IA
 
-### Comparación
-- Tiempo: más rápido con IA
-- Calidad: mejor experiencia de usuario
-- Comprensión: aprendí a pensar más en casos reales de uso
+La IA propuso utilizar el método filter(), que es una solución más moderna y concisa.
 
----
+function filtrarCompletadas(tareas) {
+  return tareas.filter(tarea => tarea.completada);
+}
+Comparación
+Aspecto	Sin IA	Con IA
+Tiempo	Medio	Muy rápido
+Calidad	Correcta	Mejor legibilidad
+Comprensión	Buena	Buena
 
-## Conclusiones generales
+En este caso la IA ayudó a recordar una solución más idiomática de JavaScript.
 
-Después de estos experimentos, he observado lo siguiente:
+Experimentos aplicados al proyecto TaskFlow
+Experimento 4: sistema de filtros de tareas
+Sin IA
 
-- La IA acelera especialmente tareas de refactorización y debugging.
-- En problemas sencillos, la diferencia de tiempo puede ser pequeña.
-- Resolver primero sin IA ayuda a entender mejor la lógica.
-- Usar IA después permite comparar, optimizar y mejorar el resultado.
-- La revisión manual sigue siendo imprescindible.
+Intenté diseñar manualmente la lógica para filtrar tareas por:
 
-## Conclusión final
+texto
 
-La IA ha sido más útil como herramienta de apoyo que como sustituto del proceso de programación. Me ha ayudado a detectar errores más rápido, a mejorar estructura y a documentar el proyecto, pero las mejores decisiones han llegado al revisar y adaptar manualmente lo generado.
+estado (completada o pendiente)
+
+categoría
+
+La parte más complicada fue organizar bien las condiciones y mantener el código legible.
+
+Con IA
+
+La IA sugirió dividir la lógica en funciones más pequeñas y reutilizables, lo que facilitó el mantenimiento del código.
+
+Ejemplo de estructura sugerida:
+
+function filtrarPorTexto(tareas, texto) {
+  return tareas.filter(t => t.texto.includes(texto));
+}
+Comparación
+Aspecto	Sin IA	Con IA
+Tiempo	Alto	Medio
+Calidad	Correcta	Mejor estructura
+Comprensión	Media	Alta tras revisar
+
+La IA ayudó a organizar mejor el código y separar responsabilidades.
+
+Experimento 5: problema de layout responsive
+Sin IA
+
+Intenté resolver el problema modificando clases de Tailwind y probando diferentes combinaciones de grid y flexbox.
+
+El proceso fue lento porque el problema real no estaba en el CSS sino en la estructura del HTML.
+
+Con IA
+
+La IA detectó que el layout estaba mal estructurado y sugirió reorganizar los contenedores principales.
+
+Esto permitió resolver el problema de forma más clara y estable.
+
+Comparación
+Aspecto	Sin IA	Con IA
+Tiempo	Alto	Mucho menor
+Calidad	Parcial	Solución completa
+Comprensión	Baja al principio	Mejor tras analizar la solución
+
+Este experimento muestra que la IA puede ser especialmente útil en debugging de problemas complejos.
+
+Experimento 6: validaciones del formulario
+Sin IA
+
+Inicialmente añadí validaciones básicas para evitar que se guardaran tareas vacías.
+
+Con IA
+
+La IA sugirió añadir validaciones adicionales como:
+
+evitar textos duplicados
+
+limpiar espacios en blanco
+
+mostrar mensajes al usuario
+
+limitar la longitud del texto
+
+Comparación
+Aspecto	Sin IA	Con IA
+Tiempo	Medio	Bajo
+Calidad	Básica	Mejor experiencia de usuario
+Comprensión	Media	Alta
+
+La IA ayudó a pensar en casos de uso más reales.
+
+Conclusiones generales
+
+Tras realizar estos experimentos se pueden extraer varias conclusiones:
+
+La IA acelera especialmente tareas de refactorización y debugging.
+
+En problemas sencillos la diferencia de tiempo puede ser pequeña.
+
+Resolver primero un problema sin IA ayuda a entender mejor la lógica.
+
+Usar IA posteriormente permite optimizar y mejorar la solución inicial.
+
+La revisión manual del código sigue siendo imprescindible.
+
+Conclusión final
+
+La inteligencia artificial se ha demostrado como una herramienta muy útil dentro del proceso de desarrollo, especialmente para:
+
+detectar errores
+
+proponer mejoras estructurales
+
+generar soluciones iniciales
+
+revisar código existente
+
+Sin embargo, estos experimentos muestran que la IA funciona mejor como herramienta de apoyo y no como sustituto del proceso de programación.
+
+El mejor resultado se obtiene cuando el desarrollador combina pensamiento propio + revisión crítica + uso inteligente de la IA.

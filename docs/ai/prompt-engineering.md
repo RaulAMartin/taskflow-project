@@ -1,128 +1,302 @@
-
 # Prompt engineering aplicado al desarrollo
 
-En este documento recojo prompts utilizados durante el desarrollo del proyecto TaskFlow para generar código, refactorizar funciones, mejorar la estructura y documentar el trabajo realizado.
+## Introducción
 
-## Objetivo del documento
+En este documento se recogen distintos **prompts utilizados durante el desarrollo del proyecto TaskFlow** para interactuar con herramientas de inteligencia artificial como ChatGPT o Claude.
 
-El objetivo es mostrar cómo diferentes tipos de prompts pueden mejorar la calidad de las respuestas generadas por la IA y hacer más útil su aplicación en desarrollo web.
+El objetivo es mostrar cómo diferentes técnicas de **prompt engineering** pueden mejorar la calidad de las respuestas generadas por la IA y facilitar su uso en tareas de desarrollo web como:
 
-## Prompt 1: definir un rol
+- generación de código
+- refactorización
+- debugging
+- documentación
+- revisión de calidad del código
 
-### Prompt
-Actúa como un desarrollador frontend senior. Revisa este código y propón mejoras de estructura, legibilidad y responsive sin romper la funcionalidad existente.
-
-### Por qué funciona bien
-Define un contexto claro y orienta la respuesta hacia revisión técnica y buenas prácticas.
-
----
-
-## Prompt 2: pedir razonamiento paso a paso
-
-### Prompt
-Analiza este problema paso a paso: en móvil se ve bien, pero en escritorio los bloques no aparecen uno al lado del otro. Explica qué está mal y cómo corregirlo.
-
-### Por qué funciona bien
-Hace que la IA no salte directamente al código y primero identifique la causa del problema.
+Durante la práctica se experimentó con varias estrategias como **role prompting, few-shot prompting, razonamiento paso a paso y restricciones claras**.
 
 ---
 
-## Prompt 3: pedir solo código listo para copiar
+# Objetivo del documento
+
+Este documento pretende:
+
+- recopilar prompts útiles utilizados durante el proyecto
+- explicar qué técnica de prompting se está aplicando
+- analizar por qué el prompt produce mejores resultados
+
+---
+
+# Prompts utilizados
+
+## Prompt 1: Definir un rol (Role Prompting)
 
 ### Prompt
+
+
+Actúa como un desarrollador frontend senior.
+Revisa este código y propón mejoras de estructura, legibilidad y responsive sin romper la funcionalidad existente.
+
+
+### Técnica utilizada
+
+**Role prompting**
+
+### Por qué funciona bien
+
+Definir un rol ayuda a orientar el tipo de respuesta que genera la IA.  
+Al pedir que actúe como un **desarrollador senior**, la respuesta suele centrarse en:
+
+- buenas prácticas
+- calidad del código
+- mejoras estructurales
+- optimización del diseño
+
+Esto produce respuestas más cercanas a una revisión profesional de código.
+
+---
+
+## Prompt 2: Razonamiento paso a paso (Chain of Thought)
+
+### Prompt
+
+
+Analiza este problema paso a paso: en móvil se ve bien, pero en escritorio los bloques no aparecen uno al lado del otro.
+Explica qué está mal y cómo corregirlo.
+
+
+### Técnica utilizada
+
+**Chain-of-thought prompting**
+
+### Por qué funciona bien
+
+Este tipo de prompt obliga a la IA a **razonar antes de generar la solución**, lo que ayuda a:
+
+- identificar correctamente el problema
+- evitar soluciones incorrectas
+- explicar mejor el origen del error
+
+Es especialmente útil para **debugging**.
+
+---
+
+## Prompt 3: Solicitar código completo
+
+### Prompt
+
+
 Devuélveme únicamente el código completo de index.html listo para copiar y pegar, sin resumir ni omitir partes.
 
+
+### Técnica utilizada
+
+**Restricción de formato de salida**
+
 ### Por qué funciona bien
-Evita respuestas parciales y hace la salida más práctica.
+
+Este prompt evita respuestas incompletas o resumidas.  
+Es útil cuando se necesita **código directamente utilizable**, sin explicaciones intermedias.
 
 ---
 
-## Prompt 4: pedir refactorización
+## Prompt 4: Refactorización controlada
 
 ### Prompt
-Refactoriza este archivo app.js manteniendo exactamente la funcionalidad actual, pero mejorando nombres, reutilización de funciones y legibilidad.
+
+
+Refactoriza este archivo app.js manteniendo exactamente la funcionalidad actual,
+pero mejorando nombres de variables, reutilización de funciones y legibilidad.
+
+
+### Técnica utilizada
+
+**Refactorización con restricciones**
 
 ### Por qué funciona bien
-Obliga a respetar el comportamiento existente y centra el cambio en la calidad interna del código.
+
+La restricción de **mantener exactamente la funcionalidad actual** evita que la IA cambie la lógica del programa.
+
+Esto permite mejorar el código sin introducir errores funcionales.
 
 ---
 
-## Prompt 5: restricciones claras
+## Prompt 5: Restricciones técnicas claras
 
 ### Prompt
-No uses frameworks adicionales. Solo HTML, JavaScript y Tailwind CSS. Quiero una solución compatible con mi estructura actual.
+
+
+No uses frameworks adicionales.
+Solo HTML, JavaScript y Tailwind CSS.
+Quiero una solución compatible con mi estructura actual.
+
+
+### Técnica utilizada
+
+**Constraint prompting**
 
 ### Por qué funciona bien
-Limita la respuesta y evita propuestas que no encajan con el proyecto.
+
+Las restricciones reducen la probabilidad de que la IA genere soluciones incompatibles con el proyecto.
+
+Esto es importante cuando el proyecto tiene **limitaciones tecnológicas concretas**.
 
 ---
 
-## Prompt 6: few-shot prompting
+## Prompt 6: Few-shot prompting
 
 ### Prompt
+
+
 Quiero que sigas este estilo de función:
 
-```js
 function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-Ahora escribe funciones similares para cargar tareas, borrar tareas completadas y marcar todas como completadas.
+Ahora escribe funciones similares para:
 
-Por qué funciona bien
+cargar tareas
 
-Dar un ejemplo previo ayuda a que el estilo del código generado sea consistente con el proyecto.
+borrar tareas completadas
 
-Prompt 7: explicación para principiante
-Prompt
+marcar todas como completadas
+
+
+### Técnica utilizada
+
+**Few-shot prompting**
+
+### Por qué funciona bien
+
+Proporcionar un ejemplo previo ayuda a que la IA:
+
+- imite el estilo del código
+- mantenga consistencia
+- respete convenciones del proyecto
+
+Esto es especialmente útil cuando se trabaja en **proyectos reales con estructura definida**.
+
+---
+
+## Prompt 7: Ajustar el nivel de explicación
+
+### Prompt
+
 
 Explícame este bloque de código como si estuviera aprendiendo JavaScript y CSS responsive por primera vez.
 
-Por qué funciona bien
 
-Ajusta el nivel de complejidad de la respuesta.
+### Técnica utilizada
 
-Prompt 8: generación de documentación
-Prompt
+**Audience targeting**
 
-Genera una primera versión de documentación técnica para este proyecto, incluyendo funcionalidades, tecnologías, estructura y pasos de uso.
+### Por qué funciona bien
 
-Por qué funciona bien
+Permite adaptar el nivel de complejidad de la explicación.
 
-Sirve para obtener una base rápida para README u otros archivos markdown.
+Esto es útil para:
 
-Prompt 9: revisión de accesibilidad
-Prompt
+- comprender código complejo
+- aprender conceptos nuevos
+- generar documentación didáctica.
+
+---
+
+## Prompt 8: Generación de documentación
+
+### Prompt
+
+
+Genera una primera versión de documentación técnica para este proyecto, incluyendo:
+
+funcionalidades
+
+tecnologías utilizadas
+
+estructura del proyecto
+
+pasos de uso
+
+
+### Técnica utilizada
+
+**Document generation prompting**
+
+### Por qué funciona bien
+
+Permite obtener una **base inicial de documentación** que luego puede revisarse manualmente.
+
+Esto acelera la creación de archivos como:
+
+- README
+- documentación técnica
+- guías de uso
+
+---
+
+## Prompt 9: Revisión de accesibilidad
+
+### Prompt
+
 
 Revisa este HTML y dime qué aspectos básicos de accesibilidad faltan o podrían mejorarse.
 
-Por qué funciona bien
 
-Enfoca la respuesta en un aspecto concreto de calidad del proyecto.
+### Técnica utilizada
 
-Prompt 10: debugging de layout
-Prompt
+**Quality review prompting**
 
-Mi diseño debería mostrar un sidebar a la izquierda y el contenido a la derecha en escritorio, pero sigue apareciendo en columna. Encuentra el error real y propón una solución robusta.
+### Por qué funciona bien
 
-Por qué funciona bien
+Este prompt enfoca la respuesta en un aspecto específico de calidad del software: **accesibilidad web**.
 
-Describe el resultado esperado, el fallo real y pide una solución estable.
+Permite detectar problemas como:
 
-Conclusión
+- falta de etiquetas semánticas
+- ausencia de atributos `alt`
+- problemas de contraste
+- falta de etiquetas ARIA.
 
-He comprobado que los mejores prompts suelen tener estas características:
+---
 
-indican claramente el objetivo
+## Prompt 10: Debugging de layout
 
-añaden restricciones
+### Prompt
 
-especifican el nivel de detalle esperado
 
-explican el contexto del proyecto
+Mi diseño debería mostrar un sidebar a la izquierda y el contenido a la derecha en escritorio,
+pero sigue apareciendo en columna.
 
-piden revisar antes de cambiar
+Encuentra el error real y propón una solución robusta.
 
-obligan a mantener la funcionalidad existente
 
-Cuanto más claro y concreto es el prompt, más útil y precisa es la respuesta de la IA.
+### Técnica utilizada
+
+**Problem-oriented prompting**
+
+### Por qué funciona bien
+
+Este prompt describe claramente:
+
+- el comportamiento esperado
+- el problema observado
+- la necesidad de una solución estable
+
+Cuanto más contexto se proporciona, más precisa suele ser la respuesta de la IA.
+
+---
+
+# Conclusiones
+
+Tras experimentar con distintos prompts, he observado que las respuestas más útiles suelen aparecer cuando el prompt:
+
+- define claramente el **objetivo**
+- añade **restricciones técnicas**
+- proporciona **contexto del proyecto**
+- indica el **nivel de detalle esperado**
+- pide mantener la **funcionalidad existente**
+- utiliza ejemplos previos cuando es necesario
+
+En general, cuanto **más específico y estructurado es el prompt**, mayor es la calidad de la respuesta generada por la inteligencia artificial.
+
+El prompt engineering se convierte así en una habilidad importante para utilizar herramientas de IA de forma eficaz dentro del desarrollo de software.

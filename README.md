@@ -1,196 +1,114 @@
-# TaskFlow
+TaskFlow
 
-TaskFlow es una aplicación web sencilla para gestionar tareas. Permite crear, completar, eliminar y filtrar tareas directamente desde el navegador, guardando la información en LocalStorage.
 
-El objetivo de este proyecto es practicar desarrollo frontend completo utilizando HTML, JavaScript, Tailwind CSS y despliegue en la nube.
+TaskFlow es una aplicación web de gestión de tareas que permite organizar actividades de forma sencilla y visual.
 
----
+La aplicación permite crear, completar, eliminar, filtrar y ordenar tareas, guardando los datos automáticamente en LocalStorage para mantener la información incluso después de recargar la página.
 
-# Demo
+Este proyecto fue desarrollado como práctica de desarrollo frontend completo, cubriendo desde la estructura HTML hasta el despliegue en producción.
+
+Demo
+
+Aplicación en producción:
 
 https://taskflow-project-orcin.vercel.app/
 
----
+Repositorio del proyecto:
 
-# Funcionalidades
+https://github.com/RaulAMartin/taskflow-project
 
-La aplicación permite:
+Características principales
+Gestión de tareas
 
-- Crear nuevas tareas
-- Marcar tareas como completadas
-- Eliminar tareas
-- Filtrar tareas por texto
-- Filtrar por prioridad
-- Filtrar por categoría
-- Ver estadísticas de tareas
-- Marcar todas las tareas como completadas
-- Eliminar todas las tareas completadas
-- Ordenar tareas
-- Cambiar entre modo claro y modo oscuro
-- Guardar automáticamente las tareas en LocalStorage
+Crear nuevas tareas
 
----
+Editar tareas existentes
 
-# Tecnologías utilizadas
+Marcar tareas como completadas
 
-- HTML semántico
-- CSS moderno
-- Tailwind CSS
-- JavaScript
-- LocalStorage
-- Git
-- GitHub
-- Vercel
+Eliminar tareas
 
----
+Marcar todas las tareas como completadas
 
-# Estructura del proyecto
+Eliminar todas las tareas completadas
 
+Organización
+
+Filtrar tareas por texto
+
+Filtrar por prioridad
+
+Filtrar por categoría
+
+Mostrar tareas:
+
+todas
+
+pendientes
+
+completadas
+
+Ordenar tareas por diferentes criterios
+
+Estadísticas
+
+El panel lateral muestra:
+
+número total de tareas
+
+tareas completadas
+
+tareas pendientes
+
+tareas urgentes
+
+barra de progreso de completado
+
+Experiencia de usuario
+
+diseño responsive
+
+modo oscuro / modo claro
+
+animaciones suaves
+
+drag & drop para reordenar tareas
+
+guardado automático en LocalStorage
+
+Tecnologías utilizadas
+
+Este proyecto utiliza tecnologías modernas de desarrollo web:
+
+HTML5 semántico
+
+CSS3
+
+Tailwind CSS
+
+JavaScript ES6+
+
+LocalStorage
+
+Git
+
+GitHub
+
+Vercel
+
+Arquitectura del proyecto
 taskflow-project
 │
 ├── docs
-│ └── ai
-│ ├── ai-comparison.md
-│ ├── cursor-workflow.md
-│ ├── prompt-engineering.md
-│ ├── experiments.md
-│ └── reflection.md
+│   └── ai
+│       ├── ai-comparison.md
+│       ├── cursor-workflow.md
+│       ├── prompt-engineering.md
+│       ├── experiments.md
+│       └── reflection.md
 │
 ├── dist
-│ └── output.css
-│
-├── index.html
-├── app.js
-├── style.css
-├── tailwind.config.js
-├── postcss.config.js
-├── package.json
-├── package-lock.json
-└── README.md
-
-# Cómo usar la aplicación
-
-1. Escribe una tarea en el campo de texto.
-2. Pulsa el botón **Añadir** o presiona Enter.
-3. Usa el buscador para encontrar tareas.
-4. Usa los filtros para mostrar tareas específicas.
-5. Marca tareas como completadas o elimínalas.
-6. Cambia entre modo claro y oscuro.
-
-Las tareas se guardan automáticamente en el navegador.
-
----
-
-# Responsive
-
-La aplicación funciona correctamente en:
-
-- móviles
-- tablets
-- escritorio
-
-En escritorio se muestra un layout de dos columnas:
-
-
-Sidebar (estadísticas, filtros)
-Contenido principal (tareas)
-
-
-En móvil todo se reorganiza en una sola columna.
-
----
-
-# Inteligencia Artificial aplicada
-
-Durante el desarrollo se utilizaron herramientas de IA para:
-
-- analizar código
-- refactorizar funciones
-- detectar errores
-- mejorar la estructura del proyecto
-- generar documentación
-
-Toda la documentación se encuentra en:
-
-
-docs/ai
-
-
-Incluye:
-
-- comparación de asistentes de IA
-- workflow con Cursor
-- prompt engineering
-- experimentos
-- reflexión final
-
----
-
-# Instalación local
-
-Si quieres ejecutar el proyecto localmente:
-
-```bash
-git clone https://github.com/tu-usuario/taskflow-project.git
-cd taskflow-project
-npm install
-
-Para compilar Tailwind:
-
-npx tailwindcss -i ./style.css -o ./dist/output.css --watch
-
-Después abre index.html con Live Server.
-
-Testing manual
-
-Se realizaron pruebas manuales para comprobar:
-
-añadir tareas
-
-eliminar tareas
-
-completar tareas
-
-persistencia en LocalStorage
-
-funcionamiento responsive
-
-cambio de tema
-
-filtros
-
-Los resultados son correctos.
-
-Despliegue
-
-El proyecto está desplegado en Vercel.
-
-Cada push al repositorio genera automáticamente un nuevo despliegue.
-
-Autor
-
-Proyecto desarrollado por Raul Martin como parte del bootcamp de desarrollo web.
-
-
----
-
-# 3. Estructura final recomendada
-
-Tu repo debería quedar así:
-
-
-taskflow-project
-│
-├── docs
-│ └── ai
-│ ├── ai-comparison.md
-│ ├── cursor-workflow.md
-│ ├── prompt-engineering.md
-│ ├── experiments.md
-│ └── reflection.md
-│
-├── dist
-│ └── output.css
+│   └── output.css
 │
 ├── index.html
 ├── app.js
@@ -201,40 +119,197 @@ taskflow-project
 ├── package-lock.json
 ├── .gitignore
 └── README.md
+Cómo funciona
+Crear una tarea
 
+Escribe una tarea en el campo de texto.
 
-Y **sin `node_modules` en GitHub**.
+Pulsa Añadir o presiona Enter.
 
----
+La tarea aparecerá automáticamente en la lista.
 
-# 4. Subir todo a GitHub
+Gestionar tareas
 
-Ejecuta:
+Cada tarea permite:
 
-```bash
-git add .
-git commit -m "Finalize project documentation and cleanup repository"
-git push
-5. Resultado final
+marcar como completada
 
-Tu proyecto ahora cumple:
+editar el texto
 
-Semana 1
+eliminarla
 
-✔ HTML semántico
-✔ Responsive
-✔ Tailwind
-✔ LocalStorage
-✔ CRUD tareas
-✔ Filtros
-✔ Dark mode
-✔ Deploy en Vercel
+Filtros y búsqueda
 
-Semana 2
+La aplicación permite:
 
-✔ docs/ai completos
-✔ comparativa IA
-✔ prompt engineering
-✔ experiments
-✔ reflection
-✔ README documentado
+buscar tareas por texto
+
+filtrar por prioridad
+
+filtrar por categoría
+
+mostrar tareas pendientes o completadas
+
+Responsive design
+
+La aplicación está diseñada para funcionar correctamente en:
+
+móviles
+
+tablets
+
+escritorio
+
+Escritorio
+
+Layout de dos columnas:
+
+Sidebar (estadísticas y filtros)
+Contenido principal (tareas)
+
+Móvil
+
+El layout se reorganiza en una sola columna para facilitar la navegación.
+
+Instalación local
+
+Si quieres ejecutar el proyecto localmente:
+
+Clona el repositorio:
+
+git clone https://github.com/RaulAMartin/taskflow-project.git
+cd taskflow-project
+
+Instala dependencias:
+
+npm install
+
+Compila Tailwind:
+
+npx tailwindcss -i ./style.css -o ./dist/output.css --watch
+
+Después abre index.html usando Live Server en VS Code.
+
+Persistencia de datos
+
+Las tareas se almacenan en LocalStorage.
+
+Esto permite:
+
+mantener las tareas tras recargar la página
+
+guardar cambios automáticamente
+
+recuperar el estado de la aplicación al iniciar
+
+Testing manual
+
+Se realizaron pruebas manuales para verificar:
+
+añadir tareas
+
+eliminar tareas
+
+completar tareas
+
+editar tareas
+
+filtros de búsqueda
+
+persistencia en LocalStorage
+
+funcionamiento responsive
+
+cambio de tema
+
+Los resultados fueron correctos.
+
+Inteligencia Artificial aplicada
+
+Durante el desarrollo del proyecto se utilizaron herramientas de IA para mejorar el proceso de desarrollo.
+
+Se utilizaron para:
+
+análisis de código
+
+refactorización
+
+detección de errores
+
+generación de documentación
+
+mejora de estructura del proyecto
+
+La documentación completa se encuentra en:
+
+docs/ai
+
+Incluye:
+
+comparación de asistentes de IA
+
+workflow con Cursor
+
+prompt engineering
+
+experimentos
+
+reflexión final
+
+Despliegue
+
+La aplicación está desplegada en Vercel.
+
+Cada vez que se realiza un push al repositorio, Vercel genera automáticamente un nuevo despliegue.
+
+Bonus implementados
+
+El proyecto incluye varias funcionalidades extra:
+
+animaciones al crear y eliminar tareas
+
+drag & drop para reordenar tareas
+
+sistema de prioridades
+
+sistema de categorías
+
+barra de progreso de tareas completadas
+
+estadísticas en tiempo real
+
+Autor
+
+Proyecto desarrollado por:
+
+Raúl Martín
+
+GitHub
+https://github.com/RaulAMartin
+
+Repositorio del proyecto
+https://github.com/RaulAMartin/taskflow-project
+
+Objetivos de aprendizaje
+
+Este proyecto demuestra conocimientos en:
+
+HTML semántico
+
+diseño responsive
+
+Tailwind CSS
+
+manipulación del DOM
+
+gestión de estado con JavaScript
+
+persistencia de datos en LocalStorage
+
+control de versiones con Git
+
+despliegue de aplicaciones web con Vercel
+
+Licencia
+
+Proyecto desarrollado con fines educativos como parte de un bootcamp de desarrollo web.

@@ -1,132 +1,227 @@
-
 # Flujo de trabajo con Cursor
 
-En este documento voy a explicar cómo he utilizado Cursor dentro del proyecto TaskFlow, qué herramientas he probado y en qué tareas me ha ayudado durante el desarrollo.
+## Introducción
 
-## Objetivo del documento
+En este documento se describe cómo se ha utilizado **Cursor** como IDE asistido por inteligencia artificial dentro del desarrollo del proyecto **TaskFlow**.
 
-El objetivo es documentar el uso de Cursor como IDE asistido por IA dentro del flujo de desarrollo del proyecto.
+Cursor es un editor basado en **VS Code** que incorpora herramientas de inteligencia artificial capaces de analizar el contexto completo del proyecto. Esto permite generar código, refactorizar funciones y modificar múltiples archivos con mayor facilidad.
 
-## Primer contacto con Cursor
+Durante esta práctica se exploraron distintas funcionalidades del editor para comprobar cómo puede integrarse dentro del flujo de trabajo de un desarrollador.
 
-Instalé Cursor y abrí el proyecto TaskFlow para probar su funcionamiento sobre una base real de código. La interfaz es muy parecida a VS Code, por lo que la adaptación fue bastante rápida.
+---
 
-Las partes principales que exploré fueron:
+# Objetivo del documento
+
+El objetivo es documentar:
+
+- Cómo se integró Cursor en el proyecto TaskFlow
+- Qué herramientas de IA ofrece el editor
+- Qué tareas de desarrollo se pudieron acelerar
+- Ejemplos reales de mejoras aplicadas al código
+
+---
+
+# Primer contacto con Cursor
+
+Para comenzar, instalé Cursor y abrí el repositorio del proyecto **TaskFlow**.
+
+La interfaz es muy similar a **Visual Studio Code**, lo que facilita mucho la adaptación. Las secciones principales que exploré fueron:
 
 - Explorador de archivos
 - Editor de código
 - Terminal integrada
-- Chat contextual
+- Chat contextual con IA
 - Edición inline
-- Composer
+- Composer (generación de cambios en múltiples archivos)
 
-## Funciones que probé
+Gracias a esta estructura familiar, pude empezar a utilizar las herramientas de IA rápidamente dentro del propio proyecto.
 
-## 1. Autocompletado con comentarios
-Probé a escribir comentarios describiendo funciones, por ejemplo:
+---
 
-```js
+# Funcionalidades probadas
+
+## 1. Autocompletado a partir de comentarios
+
+Una de las primeras pruebas consistió en escribir comentarios que describieran la funcionalidad deseada.
+
+### Ejemplo
+
+```javascript
 // función para guardar tareas en localStorage
 
-Cursor fue capaz de sugerir implementaciones bastante razonables y cercanas a lo que necesitaba.
+Cursor generó automáticamente una posible implementación:
+
+function guardarTareas(tareas) {
+  localStorage.setItem("tareas", JSON.stringify(tareas));
+}
+
+Este tipo de autocompletado es útil para generar rápidamente funciones sencillas y repetitivas.
 
 2. Chat contextual
 
-Usé el chat para pedir explicaciones sobre partes concretas del código del proyecto, especialmente funciones relacionadas con filtros, renderizado y localStorage.
+El chat contextual permite preguntar directamente sobre el código del proyecto.
 
-Esto me ayudó a entender mejor:
+Por ejemplo, se puede seleccionar una función y preguntar algo como:
 
-qué hacía cada función
+Explica qué hace esta función y cómo podría simplificarse.
 
-cómo dividir funciones largas
+Esto fue útil para entender mejor partes del proyecto relacionadas con:
 
-qué podía mejorar en nombres y estructura
+renderizado de tareas
+
+uso de localStorage
+
+funciones de filtrado
+
+manipulación del DOM
+
+Además, el chat puede sugerir mejoras en:
+
+nombres de variables
+
+estructura de funciones
+
+reutilización de código
 
 3. Edición inline
 
-Probé la edición inline para modificar funciones concretas sin tener que reescribirlas completas. Fue útil para:
+La edición inline permite pedir modificaciones directamente sobre un fragmento de código seleccionado.
 
-mejorar nombres de variables
+Por ejemplo, se puede seleccionar una función y escribir una instrucción como:
 
-simplificar condiciones
+Simplifica esta función y mejora los nombres de las variables.
 
-reorganizar partes repetitivas
+Esto fue especialmente útil para:
 
-4. Composer
+simplificar condiciones complejas
 
-También probé Composer para generar cambios más grandes, afectando varios archivos. Este tipo de herramienta resulta útil cuando se quiere:
+eliminar código repetido
+
+mejorar legibilidad
+
+4. Uso de Composer
+
+Composer permite generar cambios que afectan a varios archivos del proyecto al mismo tiempo.
+
+Por ejemplo, se puede pedir algo como:
+
+Añade una funcionalidad para filtrar tareas completadas y actualiza el HTML, JavaScript y los eventos necesarios.
+
+Cursor puede entonces:
+
+modificar el archivo JavaScript
+
+añadir nuevos elementos al HTML
+
+actualizar eventos o funciones relacionadas
+
+Esta funcionalidad es especialmente útil para:
 
 añadir nuevas funcionalidades
 
-cambiar estructura HTML y JS a la vez
+realizar refactorizaciones amplias
 
-hacer refactorizaciones amplias
+mantener coherencia entre archivos del proyecto
 
 Mejoras obtenidas con Cursor
 Ejemplo 1: simplificación de funciones
 
-Cursor me ayudó a detectar que algunas funciones podían ser más reutilizables. Por ejemplo:
+Durante la revisión del código, Cursor ayudó a identificar funciones que podían dividirse en partes más pequeñas.
 
-separar validación
+Antes:
 
-separar filtros
+function procesarTareas(tareas) {
+  const filtradas = tareas.filter(t => !t.completada);
+  const ordenadas = filtradas.sort((a, b) => a.texto.localeCompare(b.texto));
 
-centralizar renderizado
+  renderizarTareas(ordenadas);
+}
 
-Esto mejoró la legibilidad del código.
+Después de aplicar sugerencias:
 
-Ejemplo 2: mejoras del formulario
+function filtrarTareasPendientes(tareas) {
+  return tareas.filter(t => !t.completada);
+}
 
-Cursor me ayudó a añadir validaciones extra y a pensar mejor la lógica del formulario:
+function ordenarTareas(tareas) {
+  return tareas.sort((a, b) => a.texto.localeCompare(b.texto));
+}
+
+Esto mejoró la legibilidad y reutilización del código.
+
+Ejemplo 2: mejoras en el formulario de tareas
+
+Cursor también ayudó a mejorar la lógica del formulario de creación de tareas.
+
+Se añadieron validaciones como:
 
 evitar tareas vacías
 
-limpiar texto
+limpiar espacios innecesarios
 
-comprobar textos duplicados
+prevenir duplicados
 
 mostrar mensajes al usuario
 
-Atajos o acciones frecuentes utilizadas
+Ejemplo de validación añadida:
 
-Durante las pruebas utilicé sobre todo:
+function validarTarea(texto) {
+  const textoLimpio = texto.trim();
 
-apertura del chat contextual
+  if (textoLimpio === "") {
+    return false;
+  }
 
-edición inline sobre selecciones
+  return true;
+}
 
-autocompletado en el editor
+Estas mejoras ayudan a prevenir errores en la entrada de datos.
 
-terminal integrada para ejecutar comandos del proyecto
+Atajos y acciones frecuentes utilizadas
+
+Durante las pruebas utilicé principalmente:
+
+Acción	Uso
+Ctrl + K	Abrir chat contextual
+Cmd / Ctrl + I	Edición inline
+Autocompletado automático	Generación de funciones
+Terminal integrada	Ejecutar comandos del proyecto
+Selección + prompt	Pedir refactorización
+
+Estos atajos permiten trabajar de forma rápida sin salir del editor.
 
 Valoración personal
 
-Cursor me ha parecido útil para trabajar más rápido cuando ya tengo claro lo que quiero construir. Su mayor ventaja es que entiende el contexto del proyecto y puede ayudar a modificar varias partes del código de forma más conectada que un chat aislado.
+Cursor me ha parecido una herramienta muy útil para acelerar tareas repetitivas y analizar código existente.
 
-Aun así, no conviene aceptar cambios automáticamente. Es importante revisar siempre:
+Una de sus principales ventajas es que puede trabajar con todo el contexto del proyecto, lo que permite realizar modificaciones coherentes entre varios archivos.
+
+Sin embargo, es importante no aceptar automáticamente todo el código generado. Siempre es necesario revisar:
 
 nombres de variables
 
 lógica de negocio
 
-estructura final del HTML
+estructura del HTML
 
-posibles errores de maquetación
+posibles errores en el JavaScript
 
-funcionamiento real en navegador
+comportamiento real en el navegador
 
 Conclusión
 
-Cursor es una herramienta interesante para acelerar el desarrollo, especialmente en tareas como:
+Cursor es una herramienta muy interesante para mejorar la productividad durante el desarrollo.
 
-refactorización
+En el proyecto TaskFlow resultó especialmente útil para:
 
-documentación
+refactorizar funciones
 
-explicación de código
+entender código existente
 
-generación de funciones repetitivas
+generar funciones repetitivas
 
-cambios en varios archivos
+mejorar validaciones
 
-En este proyecto me ha resultado útil como apoyo, pero no como sustituto de la revisión manual.
+realizar cambios en varios archivos
+
+Aun así, debe utilizarse como una herramienta de apoyo, no como sustituto del análisis y revisión del desarrollador.
