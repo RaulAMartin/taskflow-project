@@ -38,22 +38,21 @@ const sortTasks = document.getElementById("sortTasks");
 
 const themeToggle = document.getElementById("themeToggle");
 
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+const progressMeta = document.getElementById("progressMeta");
+
 // ---------- Config ----------
-const STORAGE_KEY = "taskflow_tasks_v5";
+const STORAGE_KEY = "taskflow_tasks_v6";
 const THEME_KEY = "taskflow_theme";
 
 let tasks = [];
 let selectedCategories = new Set();
 let currentView = "all";
-let currentSort = "newest";
+let currentSort = "manual";
 let draggedTaskId = null;
 
 // ---------- Utilidades ----------
-/**
- * Escapa HTML para evitar inyección.
- * @param {string} str
- * @returns {string}
- */
 function escapeHtml(str) {
   return String(str)
     .replaceAll("&", "&amp;")
@@ -63,31 +62,16 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
-/**
- * Normaliza espacios en un texto.
- * @param {string} text
- * @returns {string}
- */
 function normalizeText(text) {
   return String(text).trim().replace(/\s+/g, " ");
 }
 
-/**
- * Convierte prioridad en valor numérico para ordenar.
- * @param {string} priority
- * @returns {number}
- */
 function getPriorityValue(priority) {
   if (priority === "Alta") return 0;
   if (priority === "Media") return 1;
   return 2;
 }
 
-/**
- * Formatea una fecha en español.
- * @param {number} timestamp
- * @returns {string}
- */
 function formatDate(timestamp) {
   return new Date(timestamp).toLocaleString("es-ES", {
     dateStyle: "short",
@@ -95,11 +79,6 @@ function formatDate(timestamp) {
   });
 }
 
-/**
- * Muestra un mensaje de formulario.
- * @param {string} text
- * @param {"error"|"success"|"info"} type
- */
 function showFormMessage(text, type = "info") {
   if (!formMessage) return;
 
@@ -123,19 +102,12 @@ function showFormMessage(text, type = "info") {
   formMessage.className = `${baseClasses} ${colorClasses}`;
 }
 
-/** Oculta el mensaje del formulario. */
 function hideFormMessage() {
   if (!formMessage) return;
   formMessage.textContent = "";
   formMessage.className = "mt-3 hidden rounded-lg border px-3 py-2 text-sm";
 }
 
-/**
- * Valida el título de una tarea.
- * @param {string} text
- * @param {string|null} ignoreId
- * @returns {string|null}
- */
 function validateTaskText(text, ignoreId = null) {
   const clean = normalizeText(text);
 
@@ -155,12 +127,10 @@ function validateTaskText(text, ignoreId = null) {
 }
 
 // ---------- Persistencia ----------
-/** Guarda las tareas en localStorage. */
 function saveTasks() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-/** Carga las tareas desde localStorage. */
 function loadTasks() {
   const data = localStorage.getItem(STORAGE_KEY);
 
@@ -172,7 +142,6 @@ function loadTasks() {
   }
 }
 
-/** Carga tareas de ejemplo solo si la lista está vacía. */
 function seedIfEmpty() {
   if (tasks.length > 0) return;
 
@@ -207,10 +176,6 @@ function seedIfEmpty() {
 }
 
 // ---------- Búsqueda y filtros ----------
-/**
- * Sincroniza los tres inputs de búsqueda.
- * @param {string} value
- */
 function syncSearchInputs(value) {
   if (searchInput && searchInput.value !== value) searchInput.value = value;
   if (topSearchInput && topSearchInput.value !== value) topSearchInput.value = value;
@@ -219,7 +184,6 @@ function syncSearchInputs(value) {
   }
 }
 
-/** Devuelve el texto de búsqueda más actualizado. */
 function getSearchText() {
   const values = [
     searchInput?.value || "",
@@ -230,7 +194,6 @@ function getSearchText() {
   return values.sort((a, b) => b.length - a.length)[0] || "";
 }
 
-/** Devuelve las prioridades marcadas. */
 function getAllowedPriorities() {
   const set = new Set();
 
@@ -241,18 +204,12 @@ function getAllowedPriorities() {
   return set;
 }
 
-/**
- * Aplica filtros de texto, prioridad, categoría y estado.
- * @param {Array} list
- * @returns {Array}
- */
 function applyFilters(list) {
   const q = getSearchText().trim().toLowerCase();
   const allowedPriorities = getAllowedPriorities();
 
   return list.filter((task) => {
-    const matchesText =
-      q === "" || task.text.toLowerCase().includes(q);
+    const matchesText = q === "" || task.text.toLowerCase().includes(q);
 
     const matchesPriority =
       allowedPriorities.size === 0 ? false : allowedPriorities.has(task.priority);
@@ -271,13 +228,12 @@ function applyFilters(list) {
   });
 }
 
-/**
- * Ordena las tareas filtradas.
- * @param {Array} list
- * @returns {Array}
- */
 function applySort(list) {
   const sorted = [...list];
+
+  if (currentSort === "manual") {
+    return sorted;
+  }
 
   if (currentSort === "oldest") {
     sorted.sort((a, b) => a.createdAt - b.createdAt);
@@ -303,7 +259,6 @@ function applySort(list) {
 }
 
 // ---------- UI ----------
-/** Actualiza la apariencia de los filtros de categoría. */
 function updateCategoryFilterUI() {
   categoryFilterButtons.forEach((btn) => {
     const category = btn.dataset.category;
@@ -338,7 +293,6 @@ function updateCategoryFilterUI() {
   });
 }
 
-/** Actualiza la apariencia de los botones de vista. */
 function updateViewButtonsUI() {
   const map = [
     { btn: viewAllBtn, view: "all" },
@@ -357,7 +311,6 @@ function updateViewButtonsUI() {
   });
 }
 
-/** Actualiza estadísticas generales. */
 function updateStats() {
   const total = tasks.length;
   const completed = tasks.filter((task) => task.done).length;
@@ -374,47 +327,58 @@ function updateStats() {
   pillPersonal.textContent = String(tasks.filter((task) => task.category === "Personal").length);
 }
 
-/**
- * Devuelve clases visuales según la prioridad.
- * @param {string} priority
- * @returns {string}
- */
+function updateProgress() {
+  const total = tasks.length;
+  const completed = tasks.filter((task) => task.done).length;
+  const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+  if (progressBar) {
+    progressBar.style.width = `${percentage}%`;
+  }
+
+  if (progressText) {
+    progressText.textContent = `${percentage}%`;
+  }
+
+  if (progressMeta) {
+    progressMeta.textContent = `${completed} de ${total} completadas`;
+  }
+}
+
 function badgeTailwind(priority) {
   if (priority === "Alta") return "bg-red-500";
   if (priority === "Media") return "bg-amber-500";
   return "bg-emerald-500";
 }
 
-/**
- * Crea un elemento visual de tarea.
- * @param {object} task
- * @returns {HTMLElement}
- */
 function createTaskElement(task) {
   const card = document.createElement("article");
 
-card.className = [
-  "task-card",
-  "overflow-hidden",
-  "rounded-xl",
-  "border",
-  "border-slate-200",
-  "bg-white",
-  "p-4",
-  "shadow-sm",
-  "transition",
-  "duration-300",
-  "hover:-translate-y-0.5",
-  "hover:shadow-md",
-  "dark:border-slate-800",
-  "dark:bg-slate-900",
-  "opacity-0",
-  "translate-y-2",
-  task.done ? "opacity-80" : "",
-]
-  .filter(Boolean)
-  .join(" ");
+  card.className = [
+    "task-card",
+    "overflow-hidden",
+    "rounded-xl",
+    "border",
+    "border-slate-200",
+    "bg-white",
+    "p-4",
+    "shadow-sm",
+    "transition",
+    "duration-200",
+    "ease-out",
+    "hover:-translate-y-0.5",
+    "hover:shadow-md",
+    "dark:border-slate-800",
+    "dark:bg-slate-900",
+    "opacity-0",
+    "translate-y-2",
+    "cursor-move",
+    task.done ? "opacity-80" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
+  card.dataset.id = task.id;
   card.draggable = true;
 
   const titleClass = task.done ? "line-through decoration-2" : "";
@@ -506,7 +470,6 @@ function animateTaskEntry(element) {
   });
 }
 
-/** Muestra un estado vacío si no hay tareas visibles. */
 function renderEmptyState() {
   taskList.innerHTML = `
     <article class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
@@ -518,7 +481,6 @@ function renderEmptyState() {
   `;
 }
 
-/** Renderiza toda la interfaz. */
 function render() {
   taskList.innerHTML = "";
 
@@ -529,23 +491,20 @@ function render() {
     renderEmptyState();
   } else {
     sorted.forEach((task) => {
-  const taskElement = createTaskElement(task);
-  taskList.appendChild(taskElement);
-  animateTaskEntry(taskElement);
-});
+      const taskElement = createTaskElement(task);
+      taskList.appendChild(taskElement);
+      animateTaskEntry(taskElement);
+    });
+  }
 
   updateStats();
+  updateProgress();
   updateCategoryFilterUI();
   updateViewButtonsUI();
+  initDragAndDrop();
 }
 
 // ---------- CRUD ----------
-/**
- * Añade una nueva tarea.
- * @param {string} text
- * @param {string} category
- * @param {string} priority
- */
 function addTask(text, category, priority) {
   const clean = normalizeText(text);
   const error = validateTaskText(clean);
@@ -573,10 +532,6 @@ function addTask(text, category, priority) {
   render();
 }
 
-/**
- * Cambia el estado completado de una tarea.
- * @param {string} id
- */
 function toggleDone(id) {
   const task = tasks.find((item) => item.id === id);
   if (!task) return;
@@ -584,12 +539,16 @@ function toggleDone(id) {
   task.done = !task.done;
   saveTasks();
   render();
+
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card && task.done) {
+    card.classList.add("ring-2", "ring-emerald-400");
+    setTimeout(() => {
+      card.classList.remove("ring-2", "ring-emerald-400");
+    }, 500);
+  }
 }
 
-/**
- * Edita el texto de una tarea.
- * @param {string} id
- */
 function editTask(id) {
   const task = tasks.find((item) => item.id === id);
   if (!task) return;
@@ -611,11 +570,6 @@ function editTask(id) {
   render();
 }
 
-/**
- * Elimina una tarea.
- * @param {string} id
- * @param {HTMLElement|null} cardEl
- */
 function deleteTask(id, cardEl = null) {
   if (cardEl) {
     cardEl.classList.add("opacity-0", "translate-y-1.5", "pointer-events-none");
@@ -634,7 +588,6 @@ function deleteTask(id, cardEl = null) {
   render();
 }
 
-/** Marca todas las tareas como completadas. */
 function markAllAsDone() {
   const hasPending = tasks.some((task) => !task.done);
 
@@ -649,7 +602,6 @@ function markAllAsDone() {
   render();
 }
 
-/** Borra todas las tareas completadas. */
 function clearCompletedTasks() {
   const completedCount = tasks.filter((task) => task.done).length;
 
@@ -666,6 +618,7 @@ function clearCompletedTasks() {
 
 function moveTask(draggedId, targetId) {
   if (draggedId === targetId) return;
+  if (currentSort !== "manual") return;
 
   const draggedIndex = tasks.findIndex((task) => task.id === draggedId);
   const targetIndex = tasks.findIndex((task) => task.id === targetId);
@@ -831,4 +784,3 @@ loadTasks();
 seedIfEmpty();
 initThemeToggle();
 render();
-}
