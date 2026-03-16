@@ -695,6 +695,10 @@ video {
   max-width: 72rem;
 }
 
+.max-w-\[1500px\] {
+  max-width: 1500px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1478,6 +1482,10 @@ video {
 }
 
 @media (min-width: 1280px) {
+  .xl\:max-w-7xl {
+    max-width: 80rem;
+  }
+
   .xl\:flex-row {
     flex-direction: row;
   }
@@ -1492,5 +1500,11 @@ video {
 
   .xl\:justify-end {
     justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1536px) {
+  .\32xl\:max-w-\[1600px\] {
+    max-width: 1600px;
   }
 }
