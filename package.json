@@ -20,7 +20,13 @@
   "homepage": "https://github.com/RaulAMartin/taskflow-project#readme",
   "devDependencies": {
     "autoprefixer": "^10.4.27",
+    "nodemon": "^3.1.14",
     "postcss": "^8.5.8",
     "tailwindcss": "^3.4.17"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
   }
 }

@@ -1,12 +1,20 @@
-// ===== Taskflow - App JS mejorado =====
+import { getTasks, createTask, deleteTaskById } from "./api/client.js";
+
+// ===== Taskflow - App JS conectado a API =====
 
 // ---------- Elementos base ----------
+
+console.log("app.js cargado correctamente");
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
 const taskCategory = document.getElementById("taskCategory");
 const taskPriority = document.getElementById("taskPriority");
 const taskList = document.getElementById("taskList");
 const formMessage = document.getElementById("formMessage");
+
+const loadingMessage = document.getElementById("loadingMessage");
+const errorMessage = document.getElementById("errorMessage");
+const emptyMessage = document.getElementById("emptyMessage");
 
 const searchInput = document.getElementById("searchInput");
 const topSearchInput = document.getElementById("topSearchInput");
@@ -43,14 +51,12 @@ const progressText = document.getElementById("progressText");
 const progressMeta = document.getElementById("progressMeta");
 
 // ---------- Config ----------
-const STORAGE_KEY = "taskflow_tasks_v6";
 const THEME_KEY = "taskflow_theme";
 
 let tasks = [];
 let selectedCategories = new Set();
 let currentView = "all";
 let currentSort = "manual";
-let draggedTaskId = null;
 
 // ---------- Utilidades ----------
 function escapeHtml(str) {
@@ -66,17 +72,63 @@ function normalizeText(text) {
   return String(text).trim().replace(/\s+/g, " ");
 }
 
+function formatDate(dateValue) {
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Fecha no disponible";
+  }
+
+  return date.toLocaleString("es-ES", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
+}
+
+function priorityNumberToLabel(priority) {
+  if (priority >= 3) return "Alta";
+  if (priority === 2) return "Media";
+  return "Baja";
+}
+
+function priorityLabelToNumber(priority) {
+  if (priority === "Alta") return 3;
+  if (priority === "Media") return 2;
+  return 1;
+}
+
 function getPriorityValue(priority) {
   if (priority === "Alta") return 0;
   if (priority === "Media") return 1;
   return 2;
 }
 
-function formatDate(timestamp) {
-  return new Date(timestamp).toLocaleString("es-ES", {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
+function adaptTaskFromApi(task) {
+  return {
+    id: String(task.id),
+    text: task.titulo ?? "",
+    category: "Sin categoría",
+    priority: priorityNumberToLabel(task.prioridad),
+    done: Boolean(task.completada),
+    createdAt: task.createdAt ?? new Date().toISOString(),
+  };
+}
+
+function setLoading(isLoading) {
+  if (!loadingMessage) return;
+  loadingMessage.classList.toggle("hidden", !isLoading);
+}
+
+function setError(message = "") {
+  if (!errorMessage) return;
+
+  errorMessage.textContent = message;
+  errorMessage.classList.toggle("hidden", message === "");
+}
+
+function setEmptyState(show) {
+  if (!emptyMessage) return;
+  emptyMessage.classList.toggle("hidden", !show);
 }
 
 function showFormMessage(text, type = "info") {
@@ -108,71 +160,39 @@ function hideFormMessage() {
   formMessage.className = "mt-3 hidden rounded-lg border px-3 py-2 text-sm";
 }
 
-function validateTaskText(text, ignoreId = null) {
+function validateTaskText(text) {
   const clean = normalizeText(text);
 
   if (!clean) return "La tarea no puede estar vacía.";
   if (clean.length < 3) return "La tarea debe tener al menos 3 caracteres.";
   if (clean.length > 120) return "La tarea no puede superar los 120 caracteres.";
 
-  const duplicated = tasks.some(
-    (task) =>
-      task.id !== ignoreId &&
-      task.text.toLowerCase() === clean.toLowerCase()
-  );
-
-  if (duplicated) return "Ya existe una tarea con ese mismo texto.";
-
   return null;
 }
 
-// ---------- Persistencia ----------
-function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
-
-function loadTasks() {
-  const data = localStorage.getItem(STORAGE_KEY);
-
+// ---------- Estado de red ----------
+async function loadTasks() {
   try {
-    const parsed = data ? JSON.parse(data) : [];
-    tasks = Array.isArray(parsed) ? parsed : [];
-  } catch {
+    setLoading(true);
+    setError("");
+    hideFormMessage();
+
+    const apiTasks = await getTasks();
+    console.log("Tareas recibidas desde API:", apiTasks);
+
+    tasks = apiTasks.map(adaptTaskFromApi);
+
+    console.log("Tareas adaptadas para UI:", tasks);
+
+    render();
+  } catch (error) {
     tasks = [];
+    render();
+    setError(error.message || "Error al cargar las tareas.");
+    console.error("Error en loadTasks:", error);
+  } finally {
+    setLoading(false);
   }
-}
-
-function seedIfEmpty() {
-  if (tasks.length > 0) return;
-
-  tasks = [
-    {
-      id: crypto.randomUUID(),
-      text: "Terminar el proyecto",
-      category: "Estudio",
-      priority: "Alta",
-      done: false,
-      createdAt: Date.now(),
-    },
-    {
-      id: crypto.randomUUID(),
-      text: "Revisar correos",
-      category: "Trabajo",
-      priority: "Baja",
-      done: false,
-      createdAt: Date.now() - 1000 * 60 * 10,
-    },
-    {
-      id: crypto.randomUUID(),
-      text: "Preparar presentación",
-      category: "Personal",
-      priority: "Media",
-      done: false,
-      createdAt: Date.now() - 1000 * 60 * 20,
-    },
-  ];
-
-  saveTasks();
 }
 
 // ---------- Búsqueda y filtros ----------
@@ -231,23 +251,21 @@ function applyFilters(list) {
 function applySort(list) {
   const sorted = [...list];
 
-  if (currentSort === "manual") {
-    return sorted;
-  }
+  if (currentSort === "manual") return sorted;
 
   if (currentSort === "oldest") {
-    sorted.sort((a, b) => a.createdAt - b.createdAt);
+    sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   }
 
   if (currentSort === "newest") {
-    sorted.sort((a, b) => b.createdAt - a.createdAt);
+    sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 
   if (currentSort === "priority") {
     sorted.sort((a, b) => {
       const priorityDiff = getPriorityValue(a.priority) - getPriorityValue(b.priority);
       if (priorityDiff !== 0) return priorityDiff;
-      return b.createdAt - a.createdAt;
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
   }
 
@@ -322,9 +340,10 @@ function updateStats() {
   statPending.textContent = String(pending);
   statHigh.textContent = String(urgent);
 
-  pillStudy.textContent = String(tasks.filter((task) => task.category === "Estudio").length);
-  pillWork.textContent = String(tasks.filter((task) => task.category === "Trabajo").length);
-  pillPersonal.textContent = String(tasks.filter((task) => task.category === "Personal").length);
+  // El backend mínimo actual no persiste categorías.
+  pillStudy.textContent = "0";
+  pillWork.textContent = "0";
+  pillPersonal.textContent = "0";
 }
 
 function updateProgress() {
@@ -370,16 +389,9 @@ function createTaskElement(task) {
     "hover:shadow-md",
     "dark:border-slate-800",
     "dark:bg-slate-900",
-    "opacity-0",
-    "translate-y-2",
-    "cursor-move",
-    task.done ? "opacity-80" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  ].join(" ");
 
   card.dataset.id = task.id;
-  card.draggable = true;
 
   const titleClass = task.done ? "line-through decoration-2" : "";
   const badgeClass = badgeTailwind(task.priority);
@@ -464,21 +476,9 @@ function createTaskElement(task) {
   return card;
 }
 
-function animateTaskEntry(element) {
-  requestAnimationFrame(() => {
-    element.classList.remove("opacity-0", "translate-y-2");
-  });
-}
-
 function renderEmptyState() {
-  taskList.innerHTML = `
-    <article class="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div class="text-base font-semibold">No hay tareas que mostrar</div>
-      <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-        Prueba a cambiar los filtros o añade una nueva tarea.
-      </p>
-    </article>
-  `;
+  taskList.innerHTML = "";
+  setEmptyState(true);
 }
 
 function render() {
@@ -490,10 +490,11 @@ function render() {
   if (sorted.length === 0) {
     renderEmptyState();
   } else {
+    setEmptyState(false);
+
     sorted.forEach((task) => {
       const taskElement = createTaskElement(task);
       taskList.appendChild(taskElement);
-      animateTaskEntry(taskElement);
     });
   }
 
@@ -501,11 +502,10 @@ function render() {
   updateProgress();
   updateCategoryFilterUI();
   updateViewButtonsUI();
-  initDragAndDrop();
 }
 
-// ---------- CRUD ----------
-function addTask(text, category, priority) {
+// ---------- CRUD con API ----------
+async function addTask(text, category, priorityLabel) {
   const clean = normalizeText(text);
   const error = validateTaskText(clean);
 
@@ -515,147 +515,71 @@ function addTask(text, category, priority) {
     return;
   }
 
-  tasks.unshift({
-    id: crypto.randomUUID(),
-    text: clean,
-    category,
-    priority,
-    done: false,
-    createdAt: Date.now(),
-  });
+  try {
+    hideFormMessage();
+    setError("");
 
-  saveTasks();
-  taskInput.value = "";
-  hideFormMessage();
-  showFormMessage("Tarea añadida correctamente.", "success");
-  taskInput.focus();
-  render();
-}
+    const priorityNumber = priorityLabelToNumber(priorityLabel);
 
-function toggleDone(id) {
-  const task = tasks.find((item) => item.id === id);
-  if (!task) return;
+    await createTask({
+      titulo: clean,
+      prioridad: priorityNumber,
+    });
 
-  task.done = !task.done;
-  saveTasks();
-  render();
+    taskInput.value = "";
+    taskCategory.value = "Estudio";
+    taskPriority.value = "Alta";
 
-  const card = document.querySelector(`[data-id="${id}"]`);
-  if (card && task.done) {
-    card.classList.add("ring-2", "ring-emerald-400");
-    setTimeout(() => {
-      card.classList.remove("ring-2", "ring-emerald-400");
-    }, 500);
+    showFormMessage("Tarea añadida correctamente en el servidor.", "success");
+    taskInput.focus();
+
+    await loadTasks();
+  } catch (error) {
+    showFormMessage(error.message || "No se pudo añadir la tarea.", "error");
   }
 }
 
-function editTask(id) {
-  const task = tasks.find((item) => item.id === id);
-  if (!task) return;
+async function deleteTask(id) {
+  try {
+    hideFormMessage();
+    setError("");
 
-  const newText = window.prompt("Edita el texto de la tarea:", task.text);
-  if (newText === null) return;
+    await deleteTaskById(id);
 
-  const clean = normalizeText(newText);
-  const error = validateTaskText(clean, id);
-
-  if (error) {
-    showFormMessage(error, "error");
-    return;
+    showFormMessage("Tarea eliminada correctamente.", "success");
+    await loadTasks();
+  } catch (error) {
+    showFormMessage(error.message || "No se pudo eliminar la tarea.", "error");
   }
-
-  task.text = clean;
-  saveTasks();
-  showFormMessage("Tarea editada correctamente.", "success");
-  render();
 }
 
-function deleteTask(id, cardEl = null) {
-  if (cardEl) {
-    cardEl.classList.add("opacity-0", "translate-y-1.5", "pointer-events-none");
+// ---------- Funciones pendientes hasta ampliar backend ----------
+function toggleDone() {
+  showFormMessage(
+    "Completar tareas aún no está disponible: tu backend actual solo soporta GET, POST y DELETE.",
+    "info"
+  );
+}
 
-    setTimeout(() => {
-      tasks = tasks.filter((task) => task.id !== id);
-      saveTasks();
-      render();
-    }, 200);
-
-    return;
-  }
-
-  tasks = tasks.filter((task) => task.id !== id);
-  saveTasks();
-  render();
+function editTask() {
+  showFormMessage(
+    "Editar tareas aún no está disponible: necesitas añadir un endpoint PUT o PATCH en el backend.",
+    "info"
+  );
 }
 
 function markAllAsDone() {
-  const hasPending = tasks.some((task) => !task.done);
-
-  if (!hasPending) {
-    showFormMessage("Todas las tareas ya están completadas.", "info");
-    return;
-  }
-
-  tasks = tasks.map((task) => ({ ...task, done: true }));
-  saveTasks();
-  showFormMessage("Todas las tareas han sido completadas.", "success");
-  render();
+  showFormMessage(
+    "Marcar todas como completadas aún no está disponible con el backend actual.",
+    "info"
+  );
 }
 
 function clearCompletedTasks() {
-  const completedCount = tasks.filter((task) => task.done).length;
-
-  if (completedCount === 0) {
-    showFormMessage("No hay tareas completadas para borrar.", "info");
-    return;
-  }
-
-  tasks = tasks.filter((task) => !task.done);
-  saveTasks();
-  showFormMessage("Tareas completadas eliminadas.", "success");
-  render();
-}
-
-function moveTask(draggedId, targetId) {
-  if (draggedId === targetId) return;
-  if (currentSort !== "manual") return;
-
-  const draggedIndex = tasks.findIndex((task) => task.id === draggedId);
-  const targetIndex = tasks.findIndex((task) => task.id === targetId);
-
-  if (draggedIndex === -1 || targetIndex === -1) return;
-
-  const [draggedTask] = tasks.splice(draggedIndex, 1);
-  tasks.splice(targetIndex, 0, draggedTask);
-
-  saveTasks();
-  render();
-}
-
-function initDragAndDrop() {
-  const taskCards = document.querySelectorAll(".task-card");
-
-  taskCards.forEach((card) => {
-    card.addEventListener("dragstart", () => {
-      draggedTaskId = card.dataset.id;
-      card.classList.add("opacity-50");
-    });
-
-    card.addEventListener("dragend", () => {
-      draggedTaskId = null;
-      card.classList.remove("opacity-50");
-    });
-
-    card.addEventListener("dragover", (event) => {
-      event.preventDefault();
-    });
-
-    card.addEventListener("drop", () => {
-      const targetId = card.dataset.id;
-      if (!draggedTaskId || !targetId) return;
-      moveTask(draggedTaskId, targetId);
-    });
-  });
+  showFormMessage(
+    "Borrar completadas aún no está disponible porque el backend actual no permite completar tareas.",
+    "info"
+  );
 }
 
 // ---------- Tema ----------
@@ -691,12 +615,12 @@ function initThemeToggle() {
 }
 
 // ---------- Eventos ----------
-taskForm?.addEventListener("submit", (event) => {
+taskForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  addTask(taskInput.value, taskCategory.value, taskPriority.value);
+  await addTask(taskInput.value, taskCategory.value, taskPriority.value);
 });
 
-taskList?.addEventListener("click", (event) => {
+taskList?.addEventListener("click", async (event) => {
   const btn = event.target.closest("button[data-action]");
   if (!btn) return;
 
@@ -708,7 +632,7 @@ taskList?.addEventListener("click", (event) => {
 
   if (action === "toggle") toggleDone(id);
   if (action === "edit") editTask(id);
-  if (action === "delete") deleteTask(id, card);
+  if (action === "delete") await deleteTask(id);
 });
 
 if (searchInput) {
@@ -780,7 +704,5 @@ markAllDoneBtn?.addEventListener("click", markAllAsDone);
 clearCompletedBtn?.addEventListener("click", clearCompletedTasks);
 
 // ---------- Inicio ----------
-loadTasks();
-seedIfEmpty();
 initThemeToggle();
-render();
+loadTasks();
